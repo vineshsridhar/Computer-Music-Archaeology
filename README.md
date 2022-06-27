@@ -32,7 +32,7 @@ Guitar-chord files tell Expert Novice Picker what the chord progression of the p
 	#CHORDTONES	A	9,1,4
 	|
 	|
-In ENP, we have also implemented a `#SHARPKEY` statement that takes a 0 or 1, depending on whether the key of the song uses mostly sharps or flats. This produces a nicer lilypond output for songs in flat keys.
+In ENP, we have also implemented a `#SHARPKEY` statement that takes a 1 or a 0, depending on whether the key of the song uses mostly sharps or flats. This produces a nicer lilypond output for songs in flat keys.
 
 Here is what the program output when provided with the chordfile:
 
