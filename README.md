@@ -26,12 +26,12 @@ Guitar-chord files tell Expert Novice Picker what the chord progression of the p
 	#MULT	4
 	#BEATS	4
 	#CHORDTONES	Bm7	11,2,6,9
-	
+	_
 	#CHORDTONES	E7	4,8,11,2
-	
+	_
 	#CHORDTONES	A	9,1,4
-	
-	
+	_
+	_
 Here is what the program output when provided with the chordfile:
 
 alksdfklajsldfj
