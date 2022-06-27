@@ -20,20 +20,22 @@ In addition to these two files, `ENP` produces `lick.ly`, which can be compiled 
 
 # The Guitar-Chord Format
 
-Guitar-chord files tell Expert Novice Picker what the chord progression of the piece is, and as a consequence, the piece's length. It does this using four different types of statements. The `#SCALE` statement indicates what notes the program is allowed to pick from throughout the song, denoted using pitch classes. The `#MULT` and `#BEATS` statements tells us a chord's duration: each chord lasts for MULT * 16 / BEATS sixteenth notes. The `#CHORDTONES` statement adds a chord to the song. Each `#CHORDTONES` statement first supplies a cosmetic label for the chord, such as 'A' or 'C#m7', and then provides the pitch classes that spell out that chord. `#CHORDTONES` statements must be followed by at least one blank line for the chord to be added to the song. Any additional newlines add to that chord's duration. Note that `#SCALE`, `#MULT`, and `#BEATS` statements must appear only once in the chord file and should be placed above any `#CHORDTONES` statements. Below we have included a simple chordfile (The _ indicate newlines):
+Guitar-chord files tell Expert Novice Picker what the chord progression of the piece is, and as a consequence, the piece's length. It does this using four different types of statements. The `#SCALE` statement indicates what notes the program is allowed to pick from throughout the song, denoted using pitch classes. The `#MULT` and `#BEATS` statements tells us a chord's duration: each chord lasts for MULT * 16 / BEATS sixteenth notes. The `#CHORDTONES` statement adds a chord to the song. Each `#CHORDTONES` statement first supplies a cosmetic label for the chord, such as 'A' or 'C#m7', and then provides the pitch classes that spell out that chord. `#CHORDTONES` statements must be followed by at least one blank line for the chord to be added to the song. Any additional newlines add to that chord's duration. Note that `#SCALE`, `#MULT`, and `#BEATS` statements must appear only once in the chord file and should be placed above any `#CHORDTONES` statements. Also, elements in within statements must be delimited with tabs and pitch-class lists must be delimited with commas. Below we have included a simple chordfile (The | indicate newlines):
 
 	#SCALE	9,11,1,2,4,6,8
 	#MULT	4
 	#BEATS	4
 	#CHORDTONES	Bm7	11,2,6,9
-	_
+	|
 	#CHORDTONES	E7	4,8,11,2
-	_
+	|
 	#CHORDTONES	A	9,1,4
-	_
-	_
+	|
+	|
 Here is what the program output when provided with the chordfile:
 
-![Sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Expert-Novice-Picker/main/figures/ii%20V.png)
+![sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Expert-Novice-Picker/main/figures/ii%20V.png)
+
+
 
 
