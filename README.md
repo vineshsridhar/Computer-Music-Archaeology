@@ -34,6 +34,6 @@ Guitar-chord files tell Expert Novice Picker what the chord progression of the p
 	_
 Here is what the program output when provided with the chordfile:
 
-![Sample chordfile output](./figures/ii\ V.png)
+![Sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Expert-Novice-Picker/main/figures/ii%20V.png)
 
 
