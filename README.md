@@ -10,7 +10,7 @@ After navigating to the appropriate directory, compile the program using the fol
 
 	gcc lick.h lick0.c lick1d.c lick2.c -D NOMIDI
 
-The NOMIDI flag is needed because the program relies on an old midi header file that does not seem to be in the C standard library. Use the `--help` flag for usage instructions. Two CFILE/gc files have been provided: `goldrush.txt` and `foggymountaintop.txt`. Note that, by default, the program assumes that there is a file named 'tmp' in the same directory as the C files, used to store the program's output.
+The NOMIDI flag is needed because the program relies on an old midi header file that does not seem to be in the C standard library. Use the `--help` flag for usage instructions. Two CFILE/gc files have been provided: `goldrush.txt` and `foggymountaintop.txt`. Note that, by default, the program assumes that there is a file named 'tmp' in the same directory as the executable, used to store the program's output.
 
 # Interpreting Output
 
@@ -35,6 +35,7 @@ Guitar-chord files tell Expert Novice Picker what the chord progression of the p
 Here is what the program output when provided with the chordfile:
 
 ![sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Expert-Novice-Picker/main/figures/ii%20V.png)
+
 
 
 
