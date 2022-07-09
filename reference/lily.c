@@ -191,7 +191,6 @@ void lily_finish()
 
 void lily_add_chord(const char *chord, int spc, int sharp_key)
 {
-    printf("lily_add_chord %s\n", chord);
     fprintf(lof, "%s ", lilychord(chord, spc, sharp_key));
 }
 

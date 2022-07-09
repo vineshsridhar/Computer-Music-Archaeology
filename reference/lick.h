@@ -58,7 +58,6 @@ extern int ilhloc; /* initial left hand location */
 //extern int rhpat[][PATLEN];/* right-hand picking patterns */
 extern int nrhpat; /* number of patterns we can use */
 extern struct Chordstr chord_info[MAXCHRD];
-extern struct Fingerstr Fi[DIGITS];
 extern int sharp_key;
 extern FILE *trace_outfile;
 extern int chord_parsing_bug;

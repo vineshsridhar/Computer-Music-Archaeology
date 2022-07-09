@@ -8,7 +8,7 @@
 ;; in case there was a left-over, unread newline, try again:
 (cond ((or (null filename) (equal filename ""))
        (setf filename (read-line))))
-(setf gro-name (strcat filename ".gio"))
+(setf gio-name (strcat filename ".gio"))
 (setf gio-file (open gio-name))
 (cond ((null gio-file)
        (format t "Failed to open ~A~%" gio-name))

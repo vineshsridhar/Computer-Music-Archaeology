@@ -27,6 +27,8 @@ static int tuning[STRINGS] = { /* How the banjo is tuned */
 static int string_chan[STRINGS] = {
         0, 1, 2, 3, 4, /* default channel numbers for 5 strings */
 };
+static int chord_output_chan = 5;
+static int enable_chord_output = 1;
 
 int ilhloc = OPEN; /* initial left hand position */
 
@@ -47,8 +49,11 @@ int main(int argc, char *argv[])
             switch (argv[i][1]) {
             case 'c': /* set midi channels */
                 f = atoi(&argv[i][2]) - 1;
+                if (f < 0) f = 0;
+                if (f > 14) f = 14;
                 // set all string_chan's to f
                 for (s = 0; s < STRINGS; s++) string_chan[s] = f;
+                chord_output_chan = f + 1;
                 break;
             case 'l': /* specify initial left hand pos */
                 ilhloc = atoi(&argv[i][2]);
@@ -80,6 +85,9 @@ int main(int argc, char *argv[])
                 if (!(trace_outfile = fopen(DEFTRC, "w")))
                     perror(DEFTRC);
                 break;
+            case 'X': /* -X suppress chord output */
+                enable_chord_output = 0;
+                break;
             case 'C': /* -C enables chord-parsing bug */
                 chord_parsing_bug = 1;
                 break;
@@ -96,17 +104,21 @@ int main(int argc, char *argv[])
 syntax:
         fprintf(stderr, "Usage: %s CFILE [options]\n", argv[0]);
         fprintf(stderr, " CFILE contains chord specs in 'gc' format\n");
-        fprintf(stderr, " -c# specifies MIDI chan for all strings\n");
+        fprintf(stderr, " -c# specifies MIDI chan for all strings,\n"
+                        "     1 <= # <= 15 (16 reserved for chord output)\n");
         fprintf(stderr, " -l# specifies (approx) left hand location\n");
         fprintf(stderr, " -r# limits right hand patterns\n");
         fprintf(stderr, " -s#=# tunes a string\n");
         fprintf(stderr, " -tFILE puts tablature in FILE\n");
         fprintf(stderr, " -T outputs trace info in '%s'\n", DEFTRC);
+        fprintf(stderr, " -X suppress chord output, otherwise output chords to next\n"
+                     "    channel above the highest string channel, default 6\n");
         fprintf(stderr, " -C enables chord-parsing bug (see Readme.md)\n");
         fprintf(stderr, "Defaults: -l%d -r%d", OPEN, nrhpat);
         fprintf(stderr, " -s1=%d -s2=%d -s3=%d -s4=%d -s5=%d -t%s\n",
                 tuning[0], tuning[1], tuning[2], tuning[3], tuning[4], DEFTAB);
-        fprintf(stderr, "Each string defaults to its own channel, 1-50\n");
+        fprintf(stderr, "Each string defaults to its own channel, 1-5\n");
+        fprintf(stderr, "Channels numbers are in the range 1-16.\n");
         exit(2);
     }
     // initialize random number generator with current system time:
@@ -126,10 +138,19 @@ syntax:
         exit(1);
     }
 
-    // initialize writing Allgro (.gro) and standard MIDI (.mid) file:
-    smf_start(2);  // 2 channels - tempo track and melody
-    smf_channel(1, 0);  // track 1 set to MIDI channel 0
-    smf_program_change(1, 105, 0.0);  // track 1 will play Banjo sound
+    // initialize writing Allegro (.gro) and standard MIDI (.mid) file:
+    // for .gro & .mid, track 0 is tempo track, track 1 has chan 0, 
+    // track 2 has chan 1, etc. So number of tracks is 2 + highest channel
+    // number, which is either chord_output_chan if chord output is enabled,
+    // otherwise chord_output_chan - 1. We take advantage of 
+    // enable_chord_output being an integer 0 or 1 to get number of tracks:
+    int track_num = chord_output_chan + enable_chord_output + 1;
+    smf_start(track_num);
+    for (int i = 1; i < track_num; i++) {
+        smf_channel(i, i - 1);  // track n set to MIDI channel n-1
+        // all tracks play Banjo sound (105) except chords use piano (1):
+        smf_program_change(i, (i - 1 == chord_output_chan ? 1 : 105), 0.0);
+    }
 
     compose();
 
@@ -268,16 +289,19 @@ void output(int t, int str[DIGITS], int frt[STRINGS])
             if (chord_change) {  // print to tab only if there's really a change
                 fprintf(tab_outfile, " %s", chord_info[chord_pat[t]].name);
             }
-            // enumerate every chord tone and output to Adagio, Allegro, MIDI:
-            int *ctones = chord_info[chord_pat[t]].ctones;
-            for (int *lp = ctones; *lp > -1; lp++) {
-                adagio_chord_tone(*lp);
-            }
-        } else if (t % 16 == 0) {
-            int *ctones = chord_info[chord_pat[t]].ctones;
-            for (int *lp = ctones; *lp > -1; lp++) {
-                adagio_chord_tone(*lp);
-                smf_chord_tone(*lp, KVEL, 0.25);
+            if (enable_chord_output) {
+                // enumerate chords and output to Adagio, Allegro, MIDI:
+                int *ctones = chord_info[chord_pat[t]].ctones;
+                // compute duration by scanning ahead
+                int i;
+                for (i = t + 1; i < piece_len && chord_pat[t] == chord_pat[i] &&
+                                i % 16 != 0; i++) /* keep searching */ ;
+                double dur = (i - t) * 0.25;
+                for (int *lp = ctones; *lp > -1; lp++) {
+                    adagio_chord_tone(chord_output_chan, *lp, KVEL - 20, dur);
+                    // track number is chan + 1
+                    smf_note(chord_output_chan + 1, t * 0.25, *lp + 48, KVEL - 20, dur);
+                }
             }
         }
         fprintf(tab_outfile, "\n");
@@ -294,8 +318,9 @@ void output(int t, int str[DIGITS], int frt[STRINGS])
                         d, s, f, pitchof(s, f), pitchname(pitchof(s, f)));
             }
             lily_pitch(pitchof(s, f), sharp_key);
-            adagio_pitch(pitchof(s, f));
-            smf_seq_append(pitchof(s, f), KVEL, 0.25);  // SMF and Allegro
+            adagio_pitch(string_chan[s], pitchof(s, f), KVEL);
+            // SMF and Allegro output: track is channel + 1
+            smf_note(string_chan[s] + 1, t * 0.25, pitchof(s, f), KVEL, 0.25);
         }
     }
 

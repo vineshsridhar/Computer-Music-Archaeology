@@ -26,16 +26,6 @@ void smf_write(const char *filename);
 // delete and free the whole sequence 
 void smf_finish();
 
-
-// functions to insert a sequence - this can be used instead of smf_note
-// and keeps track of start times
-void smf_seq_start(int track, double start_beat);
-// use -1 for key to insert a rest. Next note will start at current time + dur
-void smf_seq_append(int key, int vel, double dur);
-// insert a chord tone at current time in sequence; must be called before
-//     smf_seq_append():
-void smf_chord_tone(int key, int vel, double dur);
-
 #ifdef __cplusplus
 }
 #endif

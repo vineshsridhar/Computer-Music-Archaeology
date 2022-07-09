@@ -45,7 +45,6 @@ int getchords(char *file)
     spc = (mult * 16) / beats; // sixteenths-per-chord
     pat = scale[0] = ctone[0] = -1;
     while (fgets(buf, sizeof buf, cfp)) {
-        //fprintf(stdout, "%s", buf);
         if (*buf == '#') {
             bp = buf;
             cp = peel(&bp);
@@ -94,7 +93,6 @@ int getchords(char *file)
                 // chord structure array.
                 if (pat == num_chrds) {
                     num_chrds++;
-                    printf("add chord #%d: %s\n", num_chrds, cname);
                     strcpy(chord_info[pat].name, cname);
                     for (j = NTONES; --j >= 0; )    
                         chord_info[pat].ctones[j] = ctone[j];
@@ -131,8 +129,6 @@ int getchords(char *file)
                 chord_pat[piece_len++] = pat;
         }
     }
-    //fprintf(stdout, "\npiece_len: %d\n", piece_len);
-    //fprintf(stdout, "num_chrds: %d\n", num_chrds);
 
     lily_end_chords();
     return piece_len;

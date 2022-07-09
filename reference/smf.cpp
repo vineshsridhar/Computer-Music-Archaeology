@@ -71,11 +71,12 @@ void smf_note(int track, double start, int key, int vel, double dur)
 {
     Alg_note_ptr note = new Alg_note();
     note->time = start;
-    note->chan = 0;
+    note->chan = track - 1;
+    note->set_identifier(key);
     note->pitch = key;
     note->loud = vel;
     note->dur = dur;
-    alg_seq->track(1)->insert(note);
+    alg_seq->track(track)->insert(note);
 }
 
 
@@ -93,27 +94,6 @@ void smf_write(const char *filename)
     if (!alg_seq->write(filename)) {
         fprintf(stderr, "Allegro file write to %s failed.\n", filename);
     }
-}
-
-
-void smf_seq_start(int track, double start_beat)
-{
-    seq_track = track;
-    seq_start_beat = start_beat;
-}
-
-
-void smf_seq_append(int key, int vel, double dur)
-{
-    smf_note(seq_track, seq_start_beat, key, vel, dur);
-    seq_start_beat += dur;
-}
-
-
-void smf_chord_tone(int key, int vel, double dur)
-{
-    smf_note(seq_track + 1, seq_start_beat, key, vel, dur);
-    // do not update seq_start_beat
 }
 
 

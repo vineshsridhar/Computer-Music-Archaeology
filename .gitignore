@@ -55,3 +55,5 @@ dkms.conf
 *.gro
 **/tmp
 
+
+/reference/lick

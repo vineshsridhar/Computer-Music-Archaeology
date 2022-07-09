@@ -6,6 +6,6 @@
 
 
 int adagio_init(const char *filename);
-void adagio_chord_tone(int pitch_class);
-void adagio_pitch(int pitch);
+void adagio_chord_tone(int chan, int pitch_class, int vel, double dur);
+void adagio_pitch(int chan, int pitch, int vel);
 void adagio_finish();
