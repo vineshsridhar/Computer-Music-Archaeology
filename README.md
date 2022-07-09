@@ -9,11 +9,11 @@ In this repo you will find two applications, the first is located in the folder 
 After navigating to the `reference` directory, compile the program using the following command:
 
 	make
-    
+
 You can then run the program with this command:
 
     ./lick foggymountaintop.txt
-    
+
 Use the `--help` flag for usage instructions. Two 'gc' format files that define chord progressions have been provided: `goldrush.txt` and `foggymountaintop.txt`.
 
 Note that, by default, the program assumes that there is a directory named `tmp` in the same directory as the executable, used to store the program's output.
