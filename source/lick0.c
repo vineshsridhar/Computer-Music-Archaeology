@@ -127,7 +127,6 @@ int *bfp, *tfp;
 			*bfp = f - mr;
 	}
 }
-*/
 
 overlap(s1, s2) /* check for string crossing */
 int s1[DIGITS], s2[DIGITS];
