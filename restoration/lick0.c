@@ -17,11 +17,12 @@ int Chan[STRINGS] = {
 };
 int Ilhloc = OPEN; /* initial left hand position */
 
-#define DEFTAB "./tmp/lick.tab"
-#define DEFTRC "./tmp/lick.trace"
+#define DEFTAB "/tmp/lick.tab"
+#define DEFTRC "/tmp/lick.trace"
 FILE *Tabfp = 0;
 FILE *Trace = 0;
-int main(int argc, char *argv[])
+main(argc, argv)
+char *argv[];
 {
 	register int i, f, s;
 	char *cp;
@@ -76,18 +77,18 @@ int main(int argc, char *argv[])
 	}
 	if (!Cpfile) {
 syntax:
-		fprintf(stderr, "Usage: %s CFILE [options]\n", argv[0]);
-		fprintf(stderr, " CFILE contains chord specs in 'gc' format\n");
-		fprintf(stderr, " -c# specifies MIDI chan for all strings\n");
-		fprintf(stderr, " -l# specifies (approx) left hand location\n");
-		fprintf(stderr, " -r# limits right hand patterns\n");
-		fprintf(stderr, " -s#=# tunes a string\n");
-		fprintf(stderr, " -tFILE puts tablature in FILE\n");
-		fprintf(stderr, " -T outputs trace info in '%s'\n", DEFTRC);
+		fprintf(stderr, "Usage: %s CFILE [options]", argv[0]);
+		fprintf(stderr, " CFILE contains chord specs in 'gc' format");
+		fprintf(stderr, " -c# specifies MIDI chan for all strings");
+		fprintf(stderr, " -l# specifies (approx) left hand location");
+		fprintf(stderr, " -r# limits right hand patterns");
+		fprintf(stderr, " -s#=# tunes a string");
+		fprintf(stderr, " -tFILE puts tablature in FILE");
+		fprintf(stderr, " -T outputs trace info in '%s'", DEFTRC);
 		fprintf(stderr, "Defaults: -l%d -r%d", OPEN, Nrhpat);
-		fprintf(stderr, " -s1=%d -s2=%d -s3=%d -s4=%d -s5=%d -t%s\n",
+		fprintf(stderr, " -s1=%d -s2=%d -s3=%d -s4=%d -s5=%d -t%s",
 		  Tuning[0], Tuning[1], Tuning[2], Tuning[3], Tuning[4], DEFTAB);
-		fprintf(stderr, "Each string defaults to its own channel, 1-50\n");
+		fprintf(stderr, "Each string defaults to its own channel, 1-5");
 		exit(2);
 	}
 	time(&now);
@@ -99,24 +100,24 @@ syntax:
 	compose();
 }
 
-int pitchof(int s, int f) /* return MIDI-style pitch for string s on fret f */
+pitchof(s, f) /* return MIDI-style pitch for string s on fret f */
 {
 	return(Tuning[s] + f);
 }
 
-int ontlist(int p, int *lp) /* return 1 iff p is on list *lp */
+ontlist(p, lp) /* return 1 iff p is on list *lp */
+int *lp;
 {
 
 	p %= 12;
 	while (*lp != -1)
-		if (p == *lp++) {
+		if (p == *lp++)
 			return(1);
-
-		}
 	return(0);
 }
 
-int rlimit(int s, int f, int mr, int *bfp, int *tfp) /* update reach limits *bfp & *tfp */
+rlimit(s, f, mr, bfp, tfp) /* update reach limits *bfp & *tfp */
+int *bfp, *tfp;
 {
 	if (f > 0) {
 		f += (s == FIFTH? 5 : 0);
@@ -127,7 +128,8 @@ int rlimit(int s, int f, int mr, int *bfp, int *tfp) /* update reach limits *bfp
 	}
 }
 
-int overlap(int s1[DIGITS], int s2[DIGITS]) /* check for string crossing */
+overlap(s1, s2) /* check for string crossing */
+int s1[DIGITS], s2[DIGITS];
 {
 	return ((s1[THUMB] >= 0 && s2[INDEX] >= 0 && s1[THUMB] <= s2[INDEX])
 	  || (s1[THUMB] >= 0 && s2[MIDDLE] >= 0 && s1[THUMB] <= s2[MIDDLE])
@@ -137,9 +139,11 @@ int overlap(int s1[DIGITS], int s2[DIGITS]) /* check for string crossing */
 	  || (s1[MIDDLE] >= 0 && s2[INDEX] >= 0 && s1[MIDDLE] >= s2[INDEX]));
 }
 
-int reach(int f1[STRINGS], int f2[STRINGS]) /* calculate fret reach */
+reach(f1, f2) /* calculate fret reach */
+int f1[STRINGS], f2[STRINGS];
 {
 	register int s, f, min, max;
+
 	min = 99;
 	max = 0;
 	for (s = STRINGS; --s >= 0; ) {
@@ -166,7 +170,7 @@ int reach(int f1[STRINGS], int f2[STRINGS]) /* calculate fret reach */
 	return(f);
 }
 
-int randr(int lo, int hi) /* return normal dist. rand # in range lo - hi (inclusive) */
+randr(lo, hi) /* return normal dist. rand # in range lo - hi (inclusive) */
 {
 	register int i;
 
@@ -174,12 +178,14 @@ int randr(int lo, int hi) /* return normal dist. rand # in range lo - hi (inclus
 	return(lo + i % (hi + 1 - lo));
 }
 
-int abs(register int i)
+abs(i)
+register int i;
 {
 	return(i < 0 ? -i : i);
 }
 
-char *pitchname(int p)
+char *
+pitchname(p)
 {
 	static char buf[64];
 
@@ -187,7 +193,8 @@ char *pitchname(int p)
 	return(buf);
 }
 
-void output(int t, int str[DIGITS], int frt[STRINGS])
+output(t, str, frt)
+int str[DIGITS], frt[STRINGS];
 {
 	register int d, s, dt, f;
 	int sf[STRINGS];
@@ -198,7 +205,7 @@ void output(int t, int str[DIGITS], int frt[STRINGS])
 			fprintf(Tabfp, "#TUNING ");
 			for (s = STRINGS; --s >= 0; )
 				fprintf(Tabfp, "%2d ", Tuning[s]);
-			fprintf(Tabfp, "\n#NUT 5 0 0 0 0\n#SPEED 16\n");
+			fprintf(Tabfp, "0NUT 5 0 0 0 00SPEED 160");
 			init++;
 		}
 		for (s = STRINGS; --s >= 0; sf[s] = -1);
@@ -217,13 +224,13 @@ void output(int t, int str[DIGITS], int frt[STRINGS])
 		}
 		if (t <= 0 || Cpat[t] != Cpat[t - 1])
 			fprintf(Tabfp, " %s", Cstr[Cpat[t]].name);
-		fprintf(Tabfp, "\n");
+		fprintf(Tabfp, "");
 	}
 	for (d = 0; d < DIGITS; d++) {
 		if ((s = str[d]) >= 0) {
 			f = frt[s];
 			if (Trace)
-				fprintf(Trace, "d=%d, s=%d, f=%d, p=%d (%s)\n",
+				fprintf(Trace, "d=%d, s=%d, f=%d, p=%d (%s)",
 				  d, s, f, pitchof(s, f), pitchname(pitchof(s, f)));
 			
 #ifndef NOMIDI
@@ -232,7 +239,7 @@ void output(int t, int str[DIGITS], int frt[STRINGS])
 			putc(pitchof(s, frt[s]), stdout);
 
 			putc(KVEL, stdout);
-#endif
+#endif NOMIDI
 		}
 	}
 #ifndef NOMIDI
@@ -250,5 +257,5 @@ void output(int t, int str[DIGITS], int frt[STRINGS])
 		putc(dt, stdout);
 		putc(MPU_NO_OP, stdout);
 	}
-#endif
+#endif NOMIDI
 }

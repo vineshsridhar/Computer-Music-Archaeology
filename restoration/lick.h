@@ -4,13 +4,12 @@
 ** define NOMIDI to compile & run with ascii output
 */
 #include <stdio.h>
-#include <stdlib.h> // I added this for atoi
-#include <time.h> // for time()
-#include <string.h> // for strcmp, strcpy
-
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
 #ifndef NOMIDI
 #include <midi.h>
-#endif
+#endif NOMIDI
 
 #define MAXCHRD 16 /* max number of unique chords */
 #define MAXLEN 1024 /* max piece length, in sixteenths */
@@ -39,7 +38,6 @@
 #define NAMELEN 8
 #define NTONES 13
 
-
 struct chrdstr {
 	char name[NAMELEN]; /* "C", "C#m", "C7", etc. (* => diminished) */
 	int ctones[NTONES]; /* chord tones (0=C, 1=C#, 11=B, -1=end) */
@@ -54,31 +52,28 @@ struct fistr { /* finger info */
 
 extern char *Knams[]; /* key names */
 extern int Nchrds; /* how many chords have been defined */
-//extern int Mcpn; /* how many chord patterns have been defined */
+extern int Mcpn; /* how many chord patterns have been defined */
 extern int Cpat[]; /* chord indices, one per sixteenth note */
 extern int Plen; /* how many sixteenths in the piece */
-//extern int Cpnum; /* which chord pattern to use (getchords.c) */
+extern int Cpnum; /* which chord pattern to use (getchords.c) */
 extern int Ilhloc; /* initial left hand location */
 extern int Tuning[STRINGS];/* How the banjo is tuned */
-//extern int rhpat[][PATLEN];/* right-hand picking patterns */
+extern int rhpat[][PATLEN];/* right-hand picking patterns */
 extern int Nrhpat; /* number of patterns we can use */
 extern struct chrdstr Cstr[MAXCHRD];
 extern struct fistr Fi[DIGITS];
 extern FILE *Trace;
 extern FILE *Tabfp;
 
-
-// Added Function Prototypes
-char *pitchname(int p);
-void compose();
-int getchords(char *file);
-int pitchof(int s, int f);
-int ontlist(int p, int *lp);
-void pickstring(int fpat, int strngs[DIGITS]);
-int overlap(int s1[DIGITS], int s2[DIGITS]);
-int meval(int t, int ap, int ns);
-int eval(int t0, int strings[MAXLEN][DIGITS], int frets[MAXLEN][STRINGS]);
-void output(int t, int str[DIGITS], int frt[STRINGS]);
-void cnvlist(char *str, int *list, int len);
-char *peel(char **spp);
-int randr(int lo, int hi);
+char *pitchname();
+getchords(char *file);
+compose();
+pitchof(int s,int i);
+ontlist(int p, int *lp);
+pickstring(int fpat, int strngs[DIGITS]);
+meval(int t, int ap, int ns);
+eval(int t0, int strings[MAXLEN][DIGITS], int frets[MAXLEN][STRINGS]);
+overlap(int s1[DIGITS], int s2[DIGITS]);
+output(int t, int str[DIGITS], int frt[STRINGS]);
+randr(int lo, int hi);
+cnvlist(char *str, int *list, int len);
