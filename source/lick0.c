@@ -116,7 +116,7 @@ int *lp;
 	return(0);
 }
 
-rlimit(s, f, mr, bfp, tfp) /* update reach limits *bfp & *tfp 
+rlimit(s, f, mr, bfp, tfp) /* update reach limits *bfp & *tfp */
 int *bfp, *tfp;
 {
 	if (f > 0) {
