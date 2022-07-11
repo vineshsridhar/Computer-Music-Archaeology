@@ -2,7 +2,7 @@
 
 Code and documentation for Peter Langston's *Expert Novice Picker*, aka lick.c, presented in his paper *Six Techniques for Algorithmic Music Composition*. The program accepts a data file that specifies the chord changes and length of the piece and outputs a banjo improvisation fitted to those parameters.
 
-In this repo you will find two applications, the first is located in the folder `restoration`, which presents the program in a form closest to how it was presented in the original paper. The other folder, `reference`, contains a modified version of the program that produces output in multiple formats, contains more documentation and many stylistic changes to the code. The intention is to make the behavior of `reference` the same as the original, but to make the code more readable.
+In this repo you will find two applications, the first is located in the folder `restoration`, which presents the program in a form closest to how it was presented in the original paper (you can find Langston's original source code in the `source` folder). The other folder, `reference`, contains a modified version of the program that produces output in multiple formats, contains more documentation and many stylistic changes to the code. The intention is to make the behavior of `reference` the same as the original, but to make the code more readable. 
 
 # Compiling and Running
 
