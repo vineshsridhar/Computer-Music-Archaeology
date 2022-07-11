@@ -104,7 +104,7 @@ char **spp;
 	while (*bp > ' ')
 		bp++;
 	if (*bp != ' ') {
-		*bp++ = ' ';
+		*bp++ = '\0';
 		while (*bp && *bp <= ' ')
 			bp++;
 	}

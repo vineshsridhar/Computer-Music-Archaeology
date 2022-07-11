@@ -17,8 +17,8 @@ int Chan[STRINGS] = {
 };
 int Ilhloc = OPEN; /* initial left hand position */
 
-#define DEFTAB "/tmp/lick.tab"
-#define DEFTRC "/tmp/lick.trace"
+#define DEFTAB "./tmp/lick.tab"
+#define DEFTRC "./tmp/lick.trace"
 FILE *Tabfp = 0;
 FILE *Trace = 0;
 main(argc, argv)
@@ -205,7 +205,7 @@ int str[DIGITS], frt[STRINGS];
 			fprintf(Tabfp, "#TUNING ");
 			for (s = STRINGS; --s >= 0; )
 				fprintf(Tabfp, "%2d ", Tuning[s]);
-			fprintf(Tabfp, "0NUT 5 0 0 0 00SPEED 160");
+			fprintf(Tabfp, "0NUT 5 0 0 0 00SPEED 16");
 			init++;
 		}
 		for (s = STRINGS; --s >= 0; sf[s] = -1);
