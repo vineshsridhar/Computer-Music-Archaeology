@@ -43,7 +43,7 @@ Lilypond output assumes chord labels have the form
 
 where `<pitch>` is in CDEFGAB, `<sharp>` is either "#" or "" (empty), `<extra>` is "" (empty), "m" (minor), "m7" (minor 7th), "M7" (major 7th), "*" (diminished) or "*7" (diminished 7th). Other chords *might* work, e.g. "6" or "m6".
     
-`#CHORDTONES` statements must be followed by one one blank line for each time the chord is to be added to the song. Each blank line adds the duration of the chord.
+`#CHORDTONES` statements must be followed by one blank line. Adding more blank lines increases the duration of the chord.
 
 Note that `#SCALE`, `#MULT`, and `#BEATS` statements must appear only once in the chord file and should be placed above any `#CHORDTONES` statements. Also, elements within statements must be delimited with tabs and pitch-class lists must be delimited with commas. Below we have included a simple chordfile (The | indicate newlines, and note that tabs may not be rendered faithfully by MarkDown, but in any case, spaces here have a single TAB character):
 
