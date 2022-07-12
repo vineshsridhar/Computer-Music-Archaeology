@@ -64,6 +64,10 @@ Here is what the program outputs when provided with the chordfile:
 
 ![sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Expert-Novice-Picker/main/figures/ii%20V.png)
 
+# Examples
+
+In the examples folder we have included some sample outputs from the bluegrass standards *East Virginia Blues*, *Foggy Mountain Top*, and *Gold Rush*. By default the guitar is tuned to the key of G, but *Gold Rush* and *East Virginia Blues* are in the keys of D and A respectively, so we have included `bluegrass cmd input.txt`, which provides commands to run lick.c with the appropriate tuning for each song. 
+
 
 
 
