@@ -62,6 +62,8 @@ int nearest(int k, int tones[12], int flg);
 void noteonoff(int k, long start, long stop);
 void noteon(int c, int k, long when);
 void noteoff(int c, int k, long when);
+long putmcmdadagio(FILE *ofp, MCMD *mp, int noteon);
+
 
 #define	DEFSTYLE	"class"
 struct	stylstr	{		/* definitions of styles */
@@ -323,20 +325,28 @@ long	now;
 
 	if (wrdcmp(cp, "#CHORD") == 0) {
 	    cp = speel(&bp, 0);
+	    printf("found at %d\n", find(cp));
 	    if ((cn = find(cp)) == -1 && (cn = Numchords++) >= MAXCH)
 		syntax("Too many chords defined");
+	    printf("cn: %d\n", cn);
 	    strcopy(Ch[cn].name, cp);
 	    cp = speel(&bp, 0);
+		
 	    Ch[cn].group = myatoi(cp);
 	    for (i = 0; i < 12; i++) {
 		Ch[cn].trans[i] = myatoi(bp);
 		while (*bp && *bp++ != ',');
 		Ch[cn].ctone[i] = 0;
+		printf("trans %d: %d\n", i, Ch[cn].trans[i]);
 	    }
 	    for (ctp = Ctones[Ch[cn].group - 1]; *ctp >= 0; ctp++) {
 		i = PC(*ctp + S[Style].key);
 		Ch[cn].ctone[PC(i + Ch[cn].trans[i])]++;
+		printf("ctone[%d] = %d\n", PC(i + Ch[cn].trans[i]), Ch[cn].ctone[PC(i + Ch[cn].trans[i])]);
 	    }
+
+	    for (i = 0; i < Numchords; i++)
+	        printf("Chord: %s\n", Ch[i].name);
 	} else if (wrdcmp(cp, "#INCLUDE") == 0) {
 	    if (*bp++ != '"')
 		syntax("#INCLUDE must use quotes (\")");
@@ -1792,7 +1802,8 @@ DBG(stderr, "  %s (%d) key-on @%ld\n", key2name(k), k, when);
 	m.cmd[0] = CH_KEY_ON | Chan[c];
 	m.cmd[1] = k;
 	m.cmd[2] = Vol[c];
-	putmcmd(stdout, &m);
+	//putmcmd(stdout, &m);
+	putmcmdadagio(stdout, &m, 1);
 }
 
 void noteoff(c, k, when)
@@ -1810,7 +1821,8 @@ DBG(stderr, "  %s (%d) key-off @%ld\n", key2name(k), k, when);
 	m.cmd[0] = CH_KEY_ON | Chan[c];
 	m.cmd[1] = k;
 	m.cmd[2] = 0;
-	putmcmd(stdout, &m);
+	//putmcmd(stdout, &m);
+	putmcmdadagio(stdout, &m, 0);
 }
 
 int wrdcmp(ap, bp)
