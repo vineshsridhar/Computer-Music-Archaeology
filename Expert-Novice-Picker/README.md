@@ -62,7 +62,7 @@ In the reference version, we have also implemented a `#SHARPKEY` statement that 
 
 Here is what the program outputs when provided with the chordfile:
 
-![sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Expert-Novice-Picker/main/figures/ii%20V.png)
+![sample chordfile output](https://raw.githubusercontent.com/vineshsridhar/Computer-Music-Archaeology/main/Expert-Novice-Picker/figures/ii%20V.png)
 
 # Examples
 
