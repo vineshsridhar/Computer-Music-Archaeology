@@ -1,0 +1,4 @@
+# Tunes the banjo to the key of each song.
+./lick goldrush.txt -s1=64 -s2=61 -s3=57 -s4=52 -s5=69
+./lick foggymountaintop.txt
+./lick eastvirginiablues.txt -s1=69 -s2=66 -s3=62 -s4=57 -s5=74
