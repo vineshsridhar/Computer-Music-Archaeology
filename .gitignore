@@ -54,6 +54,6 @@ dkms.conf
 *.ly
 *.gro
 **/tmp
-
+*.DS_STORE
 
 /reference/lick
