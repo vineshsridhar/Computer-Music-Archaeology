@@ -1,0 +1,19 @@
+.TH MPU2AUD 1 "October 20, 1989"
+.AT 3
+.SH NAME
+mpu2aud \- convert MPU (time-tagged MIDI) to \(*m-law sound data
+.SH SYNOPSIS
+.B mpu2aud
+<file.mpu >file.au
+.SH DESCRIPTION
+\fIMpu2aud\fP interprets time-tagged MIDI data (in MPU format) into
+sound files in the format recognized by /dev/audio.
+\fIMpu2aud\fP uses the routine \fIpluck()\fP to generate the note
+waveforms, see audgen(3) for details.
+All MIDI channels are converted and merged into a single output stream.
+.SH BUGS
+Other waveform generators should be available.
+.SH SEE ALSO
+audgen(3)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

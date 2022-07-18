@@ -1,0 +1,246 @@
+Here's the SPARCstation MIDI driver.  It's a hack, unsupported, etc,
+but it seems to work.  I've included a program (mpu2sun) that plays
+psl-style mpu files.
+
+Data is just a bunch of time-stamped bytes (2-byte delay,
+1-byte byte count, data...see mpu2sun.c).
+
+There's a couple of known problems with the midi driver...
+
+1) when /dev/midi reads input data, it merely timestamps a bunch of bytes.
+   keynote clearly needs to translate that sequence into timestamped midi
+   messages.  it would be nice if that particular piece of the puzzle
+   was either:
+	- a mod to the driver
+	- a streams module
+	- a user-level module that could be used independent of keynote
+
+2) the time-stamping of input data is subject to drift.  the problem is that
+   the time-stamp is quantized to the clock resolution, but the time-stamp
+   itself is a 'difference' between the previous timestamp and the current
+   time.  thus, error accumulates.  the proper solution is to measure the
+   current 'time' against a known fixed starting point, then calculate the
+   delta from the previously issued time stamp.
+
+3) when you close the device, a bunch of 'note off' messages are transmitted
+   (unfortunately, not all synths respond to 'All Notes Off').  the correct
+   solution is to keep a note table for every midi channel and turn off
+   only active notes.  again, it would be nice if this was done as a
+   driver or streams or other independent module.
+
+------------------------------------------------
+
+From: (Tom Lyon)
+Date: Thu, 1 Feb 90 13:55:36 PST
+Subject: MIDI baud rate
+
+Here's a kludge you can use to set a Sun serial port to a strange baud rate.
+The basic baud rate clock is 4915200 Hz, the number you need to feed the chip
+is round(4915200/(32*baudrate-2)), which for MIDI (31250 baud) gives 5.
+Pick a standard UNIX baud rate which you are unlikely ever to use, e.g,
+50 baud.  This is represented internally as B50 in <sys/ttydev.h> which is 1.
+The zs_speeds array in the kernel is a short-word array indexed by B50;
+replace the value you find (3070) with 5.  Then, you can use the stty command
+to set the baud rate to 50, but the hardware will run at 31250.
+
+Actually, because of roundoff error, the hardware will run at about 30720
+baud, which is about 1.7% off.  Should be OK because async restarts the
+clock on each character.
+
+------------------------------------------------
+
+From: (Daniel Steinberg)
+Date: Tue Mar 27 11:45:13 1990
+Subject: high precision timer
+
+  This is to remind you about our conversation at the picnic last friday.
+I am very interested in seeing a well-defined kernel interface for access
+to the high-precision timers in the SPARCstation and future products.
+Tom Lyon might also have some ideas about this, as he used one of the timers
+to implement a prototype MIDI driver for the SPARCstation intro event.
+
+  I can imagine configuring one of the timers as a free-running, non-
+interrupting counter that could be used for performance measurement and
+profiling.  The other timer could be used for a high-precision interrupt
+callback scheduler.  An ideal interface would allow arbitrary kernel
+threads to schedule interrupts, and would do all the bookkeeping necessary
+to linearize them.
+
+  The P1003.4 (POSIX Real-Time Extensions Standard) spec details a user
+interface for high-precision timers.  The kernel-side of this interface
+would be one of the principal clients of the timer interface.  [In fact,
+this makes me wonder if anyone at Sun is already looking into this in the
+context of implementing P1003.4.  John, do you know about this?]
+
+  I am willing to take responsibility for integrating such an interface
+into the kernel, though i have no particular attachment to doing the
+initial design and implementation work.  If you have any ideas and/or
+interest in designing this, i'd like to encourage you to proceed.
+As a formal MIDI product plan emerges, we will have specific dependencies
+on this feature.
+
+-daniel
+
+-----------------------------------------------------
+
+From: (John Zolnowsky)
+Date: Tue Mar 27 13:45:57 1990
+Subject: Re:  high precision timer
+
+> >>The onboard timers don't work well as one-shots.
+> Could you explain this, please?
+
+OK.  I'll assume that you aren't familiar with the details of the
+SS1 timers.  There are four registers for two timers:
+	Counter register 0
+	Limit register 0
+	Counter register 1
+	Limit register 1
+Each is a 32-bit register, with the low-order 10 bits fixed at zero
+(for extension to nanoseconds, presumably).  Each counter register is
+incremented once each microsecond.  Bits [30:10] of each counter count,
+and are compared with the corresponding limit.  If the values compare,
+an interrupt request is generated, level 10 for counter 0, 14 for
+counter 1, and the counter is reset.  Bit 31 of the counter register
+records the interrupt request.  Loading a new value into the limit
+register resets the corresponding counter register.
+
+Thus these are designed to be used as periodic timers.  You could
+easily change the limit register based on the next scheduled event, but
+the manipulations do not provide for being able to do this without
+losing counts.  Since you could simply turn off traps during this code
+sequence, perhaps you could do a reasonable job of compensating for the
+loss.  I expect that trying to schedule with much better than one
+millisecond resolution will involve lots of nasty conditions, and the
+possibility of lost interrupts.
+
+----------------------------------------------------
+
+From: (Daniel Steinberg)
+Date: Tue Mar 27 11:45:13 1990
+Subject: high precision timer
+
+I'm thinking out loud here:
+Suppose you have a kernel routine that looks something like this:
+	sched_timer(when, whence, wakeup, addr)
+where:
+	when	timeval
+	whence	enumeration: RELATIVE vs ABSOLUTE (vs PERIODIC ?)
+	wakeup	if non-NULL, a caddr_t to call wakeup() with when the
+		timer goes off
+	addr	if non-NULL, the address of a function to call when the
+		timer goes off
+
+sched_timer() would have to keep an ordered, linked list of structures
+containing timer event descriptors (periodic timers would complicate this
+model somewhat).  Each descriptor would contain the wakeup/addr and the
+number of clock ticks from the previous entry (inserting an entry would
+require adjusting all subsequent entries).  When a timer interrupt goes
+off, the first thing that happens is that the next entry's count is
+loaded into the counter register.
+
+- Assuming that level 14 is non-maskable and level 10 is maskable,
+  you could load the counter with fairly high precision and determinism
+  if it's the level 14 counter.  This would keep the clock drift to an
+  absolute minimum.
+  
+- To perform an interrupt callout, the level 14 interrupt routine would
+  have to arrange for a lower-priority interrupt to occur.  Naturally,
+  the callout can never be as deterministic as the timer, since the kernel
+  can mask interrupts for long periods.
+  
+- If it takes N clock ticks to service the interrupt and reload the counter,
+  then requests for time intervals less than N must be folded together.
+  
+- The level 14 interrupt routine would also have to deal with getting
+  multiple interrupts before the lower priority back end runs.  If you
+  schedule a periodic timer with an extremely short period, the system
+  must avoid backlog.  Perhaps the interrupt callout procedure takes an
+  argument (ordinarily one) which is the interrupt count.
+  
+Hmmm, i agree that this timer scheme is less than optimal.  Because of
+the nature of the UNIX kernel, achieving high precision/determinism in
+the callouts (especially if you're trying to get back to a user process)
+is problemmatic.  But i think that the precision of the actual timer
+(e.g., with respect to drift) can be made to be fairly high...i.e., better
+than 1 millisecond precision.  Comments?
+
+-daniel
+
+----------------------------------------------------
+
+From: bradr@bartok (Brad Rubenstein)
+Date: Fri, 3 Aug 90 20:51:08 PDT
+Subject: midi driver
+
+The problem with the midi driver seems to be that in some places the
+top-side code that manipulates the write buffer is not blocking
+interrupts that invoke routines that also manipulate the write buffer
+(txint).
+
+During zsm_close, zsn_notes_off stuffs a bunch of data into the buffer
+while (via txint) it is being drained, and zsm_start sets TXBUSY but
+never unsets it.  On the top side, at the end of zsm_notes_off, the
+process sleeps forever (uninterruptably) on lbolt, waiting for TXBUSY
+to be unset.
+
+The driver code is very sensitive to the assertion that zm_wb.out +
+ocnt is always the location of the next record boundary (where the
+delay bytes are located).
+
+I notice that zsm_start does a ZSWRITEDATA without first checking to
+make sure zs->zs_addr->zscc_control has ZSRR0_TX_READY (particularly
+when it is called from the top side, say by zsm_write).  That might
+cause output to fall on the floor, and generate an interrupt at an
+inopportune time.
+
+------------------------------------------------
+
+From: (Tim Thompson)
+Date: Thu Sep 20 18:34:50 1990
+Subject: Re: midi driver
+
+	Also, maybe it should be possible to ask the MIDI driver to
+	report its own notion of the current time.
+...and set it, too.  i don't remember what the driver does, but this can
+be added.
+
+		My personal preference is to make the driver as dumb and
+		non-presumptuous as possible.  Hence, I'd prefer that by
+		default it not send anything at all.
+	In general, i agree.  But if the driver (or preferably STREAMS modules)
+	are MIDI-knowledgeable, then keeping note maps should be an option.
+After more thought, I realize that the default behaviour of /dev/midi
+probably *should* be to send the note-off's at the end.
+ 
+		The 2-byte delay header on MIDI data overflows (at 1 millisecond
+		resolution, which is pretty reasonable) after 65 seconds
+	One solution is to follow the Roland MPU example and send a 'timing
+	overflow' consisting of a timestamp with 0 data bytes.
+Another one that comes to mind is to use the delay encoding that is used
+in Standard MIDI Files.  It allows numbers up to 28 (or so) bits.
+It also means that small deltas would fit in 1 byte.
+It timestamps each MIDI message, but it doesn't care what kind of
+messages they are.  However, you still have to understand the
+different MIDI message types in order to figure out how long the
+message is.  There are also special messages for Standard MIDI
+File info.
+
+		It also means that you might (eventually) be able
+		to make /dev/midi accept real Standard MIDI Files
+	Well, you should probably *not* be able to 'cat' a MIDI Standard File
+	to /dev/midi, because that would imply that the device driver itself
+	knows about file headers.  (then there's the different standard levels
+	to deal with).
+
+	THe MIDI file standard should remain what it is:  a standard for
+	interchange.  Devices, and the internal formats of sequencers and
+	other midi data handlers, should use an internal representation
+	that they find most appropriate, rather than be constrained by
+	the interchange standard.  I am very open to suggestions about
+	what that format should be, even if it turns out to match the
+	MIDI Standard File time-stamping format.
+I like the SMF time-stamps a bit better, since they have the
+advantage of increased values and minimum size, but I guess the
+question is whether it's worth the additional complexity.
+I could live with overflow-messages.

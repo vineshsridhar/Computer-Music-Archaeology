@@ -1,0 +1,54 @@
+.TH AGC 1 "March 28, 1990"
+.AT 3
+.SH NAME
+agc \- automatic gain control for \(*m-law audio data
+.SH SYNOPSIS
+.B agc
+[\fB\-d\fIfract\fR]
+[\fB\-l\fIdB\fR]
+[\fB\-m\fIdB\fR]
+[\fB\-w\fIsec\fR]
+.SH DESCRIPTION
+\fIAgc\fP reads \(*m-law audio data from the standard input,
+compresses/expands it to provide a specified output level,
+and writes the result to the standard output.
+.IP \fB\-d\fIfract\fR
+Set the damping factor to \fIfract\fP.
+The damping factor governs the release time (how quickly the gain recovers
+from extremes).  The default value is 0.5; setting it lower shortens the
+release time; at 0 the release is instantaneous; at 1 the release is infinite.
+.IP \fB\-l\fIdB\fR
+Set the output level to \-\fIdB\fP decibels (note the minus sign).
+\fB0\fP represents the maximum volume, \fB6\fP is half as loud, etc.
+The default is \fB\-l1\fP (slightly less than maximum volume).
+.IP \fB\-m\fIdB\fR
+Set the maximum gain to \fIdB\fP decibels.
+\fIAgc\fP will limit its amplification to this figure
+(otherwise it tries to amplify long silences unreasonably).
+The default is \fB\-m6\fP (twice the volume).
+.IP \fB\-w\fIsec\fR
+Set the length of the window (or delay line) used to determine source level.
+The default is one second, \fB\-w1.0\fP; shorter values make more abrupt
+changes, larger values make smoother changes.
+.LP
+The technique used by \fIagc\fP is to simulate a delay line by buffering data
+(the amount is determined by the \fB\-w\fP option).
+The gain applied to the sample coming out of the delay line is
+determined by the maximum value in the delay line (\fImaxv\fP),
+the lower limit on \fImaxv\fP set by \fB\-m\fP (\fIminmax\fP),
+the desired maximum value set by \fB\-l\fP (\fIlevel\fP),
+the damping factor (\fIdamp\fP),
+and the damped maximum from the previous sample (\fIomax\fP)
+according to these relationships:
+.sp
+.in +0.5i
+if (\fImaxv\fP < \fIminmax\fP) then \fImaxv\fP = \fIminmax\fP
+.sp
+\fIomax\fP = \fIdamp\fP * \fIomax\fP + (1. - \fIdamp\fP) * \fImaxv\fP
+.sp
+output = (sample * \fIlevel\fP) / \fIomax\fP
+.in -0.5i
+.SH SEE ALSO
+gate(1), norm(1), squelch(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

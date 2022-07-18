@@ -1,0 +1,6 @@
+#QUANT quarter
+#STYLE grass
+#CHORD	C	0
+-
+-
+#

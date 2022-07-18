@@ -1,0 +1,18 @@
+### Alesis HR16 dp defs ###
+#DEFINE	Click	2/0x06
+#DEFINE	Kick	2/0x07
+#DEFINE	Snare	2/0x08
+#DEFINE	ClsHat	2/0x09
+#DEFINE	MidHat	2/0x0a
+#DEFINE	OpnHat	2/0x0b
+#DEFINE	Claps	2/0x0c
+#DEFINE	Perc3	2/0x0d
+#DEFINE	Perc4	2/0x0e
+#DEFINE	Tom1	2/0x0f
+#DEFINE	Tom2	2/0x10
+#DEFINE	Tom3	2/0x11
+#DEFINE	Tom4	2/0x12
+#DEFINE	Ride	2/0x13
+#DEFINE	Crash	2/0x14
+#DEFINE	Perc1	2/0x15
+#DEFINE	Perc2	2/0x16

@@ -1,0 +1,6 @@
+# dummy
+
+DIR=obj
+
+clean:
+

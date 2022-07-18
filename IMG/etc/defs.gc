@@ -1,0 +1,101 @@
+# Style definitions for guitar backup
+
+# built-in picking patterns
+#PICK	block  1-99
+#PICK	split  1    2-99
+#PICK	split3 1    2-99 2-99
+#PICK	alt    1    3-99 2    3-99
+
+# BLUEGRASS / COUNTRY styles
+
+# built-in bum-chang
+# form: bass   chord1 chord2 chord3 ...
+#PICK	split
+#ARTIC		1.8 0.8
+#VEL		72  64
+#STRUM	0.025
+#STYLEDEF	bum-chang
+
+# hard-driving bum-chang
+# form: bass   chord1 chord2 chord3 ...
+#PICK	split
+#ARTIC	       0.8  0.8
+#VEL	       64   80
+#STRUM	0.02
+#STYLEDEF	Driving
+
+# standard bum-chang with an alternating bass
+# form: bass1 bass2   chord1 chord2 chord3 ...
+#PICK	alt
+#ARTIC	     1.8 1.8 1.8 1.8
+#VEL	     72  64  72  64
+#STRUM	0.025
+#STYLEDEF	AltBass
+
+# hard-driving bum-chang with an alternating bass
+# form: bass1 bass2   chord1 chord2 chord3 ...
+#PICK	alt
+#ARTIC	    1.5  1.8 1.5 1.8
+#VEL	     64  80  64  80
+#STRUM	0.02
+#STYLEDEF	AltDrive
+
+# rolling accompaniment with alternating bass
+# form: bass1 bass2  mid  chord1 chord2 chord3 ...
+#PICK	Roll 1   3  4-6  3   2   3  4-6  3
+#ARTIC	     4  1.8 3.8  1   4  1.8 3.8  1
+#VEL	    72  48  64  48  72  40  64  32
+#STRUM	0.025
+#STYLEDEF	Rolling
+
+# more rhythmic rolling accompaniment with alternating bass
+# form: bass1 bass2  mid  chord1 chord2 chord3 ...
+#PICK	Roll
+#ARTIC	     4  1.5 3.8 0.8  4  1.5 3.8 0.8
+#VEL	    72  48  64  48  72   0  72   0
+#STYLEDEF	AltRoll
+
+# SWING styles
+
+# built-in swing style
+# form: chord1 chord2 chord3 ...
+#PICK	block
+#ARTIC	0.667 0.250
+#VEL	64
+#STRUM	0.0
+#STYLEDEF	swing
+
+# more rhythmic swing style
+# form: chord1 chord2 chord3 ...
+#PICK	sixes	1-99 1-99 1-99 1-99 1-99 1-99
+#ARTIC		2.8  0    0    0.8  0    0.5
+#VEL		64   0    0    72   0    48
+#STRUM	0.0
+#STYLEDEF	Swinger
+
+# MISC styles
+
+# built-in waltz bum-chang-chang
+# form: bass   chord1 chord2 chord3 ...
+#PICK	split3
+#ARTIC	2.8 0.5 0.5
+#VEL	64
+#STRUM	0.025
+#STYLEDEF	waltz
+
+# accented waltz bum-chang-chang
+# form: bass   chord1 chord2 chord3 ...
+#PICK	split3
+#ARTIC	1  0.5 0.25
+#VEL	72 64  64
+#STRUM	0.02
+#STYLEDEF	Waltzer
+
+# jazzy waltz
+# form: bass   chord1 chord2 chord3 ...
+#PICK	nines	1    0    2-99 0    0    1    2-99 0    1
+#ARTIC	        2    0    0.5  0    0    4    3    0    0.5
+#VEL	        72   0    64   0    0    64   64   0    48
+#STRUM	0.01
+#STYLEDEF	JazzWaltz
+

@@ -1,0 +1,61 @@
+.TH AVMAP 1 "October 28, 1989"
+.AT 3
+.SH NAME
+avmap \- modify volume in a \(*m-law data stream
+.SH SYNOPSIS
+.B avmap
+[\fB\-l\fP] VSPEC [...] [files or stdin]
+.SH DESCRIPTION
+.I Avmap
+allows the specification of volume changes (``fades'') during a soundfile.
+The fades are defined by a sequence of straight or logarithmically curved
+line segments.
+.PP
+The \fIVSPEC\fP arguments take the form:
+.IP \fB\-v\fP#\fB:\fP##\fB:\fP###
+This specifies the volume in terms of the ratio of output volume
+divided by input volume.
+``#'' is the ratio at the end of the transition expressed in decibels.
+This setting will apply until the next volume change takes place.
+``##'' is the point in the input at which the fade begins.
+The beginning point is specified in seconds from the beginning of the file.
+Seconds may be expressed as a floating point number,
+e.g. 0.5 for one-half second from the beginning of the piece.
+``###'' is the length of the fade in seconds.
+It may be 0 (for an instantaneous volume change), but not negative.
+.PP
+Initially, the volume ratio is assumed to be 0 dB (unity gain).
+Thus, if no VSPEC argument were specified the output would be identical
+to the input (although the syntax requires at least one VSPEC argument).
+Unless the \fB\-l\fP flag is used (or the fade length is zero),
+the ratio is interpolated linearly as a multiplicative factor
+during the transition.  For instance, half-way through a 6 dB fade
+(doubling the volume) the volume will be 1.5 times as much (\(ap4 dB).
+If the \fB\-l\fP flag is used the interpolation will be logarithmic;
+half-way through a 6 dB fade the volume will be \(ap1.4 times as much (3 dB).
+.PP
+.SH EXAMPLES
+.Cs
+% avmap <fanfare \-t6:0:0 >x
+.Ce
+The new file will contain the original data at twice the volume.
+.Cs
+% avmap <fanfare \-v3:0.5:0.5 >x
+.Ce
+If ``fanfare'' is 2 seconds long,
+``x'' will contain the first half second at the original volume,
+the next half second will fade up with a factor that changes linearly
+from 1 to 1.4 (square root of 2)
+followed by the last second at 1.4 times the volume.
+.Cs
+% avmap <song \-v6:0:0 \-v0:14:2 \-v4.2:32:2 >song2
+.Ce
+Song2 will start out with 7 seconds of double volume data,
+1.5 seconds of decrescendo (back to the original level),
+16 seconds at ``normal'' volume,
+1.6 seconds of crescendo,
+and the rest of song ``louder'' by a factor of 1.5 (4.2 dB).
+.SH SEE ALSO
+aecho(1), reverb(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

@@ -1,0 +1,51 @@
+.TH UNJUST 1 "MIDI"
+.SH NAME
+unjust - randomize the timing of MIDI note events
+.SH SYNOPSIS
+.B unjust
+[\fB-a\fP#]
+[\fB-d\fP#]
+[\fB-flat\fP]
+[\fB-q\fP#.#]
+[\fB-r\fP#]
+[files or stdin]
+.SH DESCRIPTION
+.I Unjust
+copies its input MIDI data (\fIfiles\fP or stdin) to output,
+randomizing event timings by an amount smaller than the time quantum.
+.IP "-a#"
+advances the timing of all events by # MPU clocks (except where it can't;
+e.g. a note at the beginning of the first bar can't get any earlier).
+This is intended to be used to shift a part slightly ahead of the beat.
+.IP "-d#"
+delays the timing of all events by # MPU clocks.
+This is intended to be used to shift a part slightly behind the beat.
+.IP "-flat"
+makes the random time displacements have a flat distribution
+(i.e. be uniformly distributed).
+The default is to have a triangle shaped distribution with the
+peak at 0; this is accomplished by using half of the range (called ``Q2'' here)
+in the following equation:
+.br
+dt = (rand() % Q2) - (rand() % q2).
+.IP "-q#.#"
+sets the time quantum (randomization range) to the number of MPU clocks
+in a 1/#.#th note.
+Thus, \fI-q4\fP will cause a perfectly timed file (as often found in
+computer generated melodies) to be randomized by amounts that
+range over a quarter note (i.e. < \(+- an eighth note or \(+- 59 MPU clocks).
+Note that, in theory, "just -q4" will return the perfect timings.
+The default is \fI-q32\fP.
+.IP "-r#"
+sets the randomization range (time quantum) to # MPU clocks.
+Thus, \fI-r120\fP will cause a file to be randomized by amounts that
+range over 119 MPU clocks (i.e.  \(+- 59 MPU clocks or < \(+- an eighth note).
+As above, in theory, "just -q4" will return the perfect timings.
+.PP
+\fIUnjust\fP, combined with \fIkeyvel -r\fP#, can put back some of the
+natural imperfections for which humans are so justly famous.
+.SH SEE ALSO
+just(1), keyvel(1), stretch(1), tshift(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research
+(bellcore!psl)

@@ -1,0 +1,36 @@
+.TH AECHO 1 "October 20, 1989"
+.AT 3
+.SH NAME
+aecho \- generate echoes for \(*m-law audio data
+.SH SYNOPSIS
+.B aecho
+[\fB\-d\fIsec\fR]
+[\fB\-e\fIdB\fR]
+[\fB\-f\fIdB\fR]
+[\fB\-t\fIdB\fR]
+.SH DESCRIPTION
+\fIAecho\fP reads \(*m-law audio data from
+the standard input and writes a copy with echoes
+to the standard output.
+The various parameters control the echo generation.
+.IP \-d
+set the delay to the specified number of seconds; default is 0.1.
+.IP \-e
+set the original echo attenuation to \fIdB\fP decibels.
+The default is \fB\-e6\fP which represents half-volume.
+.IP \-f
+set the echo feedback attenuation to \fIdB\fP decibels.
+The default is \fB\-e99\fP which means there is virtually no echo feedback.
+.IP \-t
+set the ending threshold to \-\fIdB\fP decibels.
+Since echoes can extend well beyond the end of the original sound sample
+(strictly speaking, any echo feedback will make the sound last forever)
+some level must be chosen at which the output can be called silent.
+When the output drops to \fIdB\fP decibels down from the maximum, the output
+will be allowed to stop.
+The default is \fB\-t30\fP which is \(ap3% of full scale (the usual standard
+in the audio industry is 60 dB, \(ap0.1% of full scale).
+.SH SEE ALSO
+reverb(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

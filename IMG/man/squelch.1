@@ -1,0 +1,29 @@
+.TH SQUELCH 1 "October 20, 1989"
+.AT 3
+.SH NAME
+squelch \- delete silences from \(*m-law audio data
+.SH SYNOPSIS
+.B squelch
+[\fB\-s\fIsec\fR]
+[\fB\-t\fIdB\fR]
+.SH DESCRIPTION
+\fISquelch\fP reads \(*m-law audio data from the standard input
+and writes a copy with passages that fall below a certain volume cut out.
+Two parameters control the deletion: a threshold and an attack/release
+time.
+The threshold is the level below which data is considered silence.
+The attack/release time is the duration over which no signal must be found
+in order to be selected for deletion.
+When data is being deleted
+a section of noise will be left before (attack) and 
+after (release) the deletion.
+.IP \-s
+Set the attack/release time to \fIsec\fP seconds.
+The default is \fI\-s0.1\fP.
+.IP \-t
+Set the threshold to \fIdB\fP decibels.
+The default is \fI\-t18\fP (one eighth of the maximum volume).
+.SH SEE ALSO
+gate(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

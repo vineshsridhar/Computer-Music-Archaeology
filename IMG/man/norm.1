@@ -1,0 +1,41 @@
+.TH NORM 1 "March 29, 1990"
+.AT 3
+.SH NAME
+norm \- normalize gain on \(*m-law audio data
+.SH SYNOPSIS
+.B norm
+[\fB\-d\fIsec\fR]
+[\fB\-l\fIdB\fR]
+[\fB\-verbose\fR]
+.SH DESCRIPTION
+\fINorm\fP reads \(*m-law audio data from the standard input,
+determines its maximum level,
+amplifies or attenuates the entire file to make the maximum level be
+the specified level,
+and writes the result to the standard output.
+.IP \fB\-d\fIsec\fR
+Set the minimum time (in milliseconds) required to qualify as the maximum.
+The default is \fB\-d0.125\fP.
+Since \(*m-law data is sampled at a rate of 0.125 milliseconds per sample,
+the default is one sample.  Thus, if, in an otherwise quiet sound file,
+there is a pop or click that makes a single large sample, the file will be
+treated as if it were all as loud as the pop.  With \fB\-d\fP set higher,
+the definition of the maximum level will be more noise immune.
+.IP \fB\-l\fIdB\fR
+Set the target maximum output level to \-\fIdB\fP decibels
+(note the minus sign).
+\fB0\fP represents the maximum possible volume, \fB6\fP is half as loud, etc.
+The default is \fB\-l1\fP (slightly less than maximum volume).
+.IP \fB\-verbose\fR
+Give information about the maximum level found in the file.
+.LP
+The technique used by \fInorm\fP is to make an initial pass through the data
+looking for the maximum value and then a second pass scaling all the data.
+The maximum is determined by generating a histogram and then,
+starting at the highest level,
+the \fB\-d\fP value is decremented by the frequency counts until it
+becomes zero or negative \- that value is called the maximum.
+.SH SEE ALSO
+agc(1), gate(1), squelch(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

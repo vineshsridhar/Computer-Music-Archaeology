@@ -1,0 +1,9 @@
+Some mpu format midi tunes from psl
+
+play with:
+   < foo.mpu mpu2aud > /dev/audio
+
+or, if you have the SUN midi driver installed:
+   < foo.mpu mpu2sun > /dev/midi
+
+

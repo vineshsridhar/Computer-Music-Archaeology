@@ -1,0 +1,53 @@
+.TH TRANSPOSE 1 "MIDI"
+.SH NAME
+transpose - transpose MIDI files
+.SH SYNOPSIS
+.B transpose
+[\fIAMTLIST\fP]
+[\fICHAN\fP\fB=\fP\fIAMTLIST\fP]
+.SH DESCRIPTION
+.I Transpose
+copies its input to its output, shifting the pitch of key-on and key-off
+events in its input by the specified amount.
+\fIAMTLIST\fP is one or more transposition amounts separated by commas.
+If two amounts are given, each note will be duplicated in the output,
+each transposed by the specified amount.
+.PP
+Transposition amounts are either specified as a signed decimal integer,
+representing the transposition in half-steps (e.g. \fB\-7\fP is down a fifth),
+or as a signed decimal integer followed by the letter \fBo\fP,
+representing the transposition in octaves (e.g. \fB2o\fP is up two octaves).
+Therefore \fB12\fP, \fB+12\fP, \fB1o\fP, and \fB+1o\fP all mean one octave up
+while \fB\-12\fP and \fB\-1o\fP both mean one octave down.
+.PP
+If a channel is specified (\fICHAN\fB=\fIAMTLIST\fR),
+only that channel is transposed (channels are numbered 1 to 16).
+Multiple channels may be transposed by using multiple arguments;
+e.g. \fB2=\-1o 4=0,\-1o 5=3\fP
+will transpose channel 2 down an octave,
+transpose channel 4 down an octave, include an untransposed copy of channel 4,
+and transpose channel 5 up 3 half-steps.
+.PP
+If no channel is specified, \fIall\fP channels will be transposed.
+Evaluation is left-to-right; thus a specification of \fB+12 2=0\fP
+is perfectly reasonable, (transpose all channels \fIexcept 2\fP up an octave);
+while a specification of \fB2=0 +12\fP is identical to \fB+12\fP.
+.PP
+A transposition of \fB0\fP is legal (but only marginally useful).
+However, there \fImust\fP be at least one transposition argument specified,
+even if it's only \fB0\fP.
+.SH EXAMPLES
+.Cs
+transpose <alto \-5 >tenor
+transpose <combo 1=1o 2=\-1o >newcombo
+transpose <trio 15=0,\-1o >fattrio
+.Ce
+The first example shifts everything in ``alto'' down a fourth.
+The second example transposes key events on channel 1 up an octave,
+transposes key events on channel 2 down an octave, and leaves everything
+else untransposed.
+The third example doubles the events on channel 15 an octave lower.
+.SH SEE ALSO
+chmap(1), merge(1), filter(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

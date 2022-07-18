@@ -1,0 +1,20 @@
+.TH INVERT 1 "MIDI"
+.SH NAME
+invert - invert notes in MIDI files
+.SH SYNOPSIS
+.B invert
+pitch <input >output
+.SH DESCRIPTION
+.I Invert
+copies its input to its output, reflecting the pitch of input notes around
+the specified pitch.
+Pitch can be specified as a note name (e.g. \fLC#3\fP),
+as a decimal number (e.g. \fL61\fP),
+or as a hexadecimal number (e.g. \fL0x3d\fP or \fL0x3D\fP).
+.PP
+Notes that would exceed the range of MIDI pitches (C-2 to G8, middle C is C3)
+are set to the limit values (try inverting around C-2 to see this).
+.SH SEE ALSO
+retro(1), transpose(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

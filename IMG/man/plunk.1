@@ -1,0 +1,41 @@
+.TH PLUNK 1 "October 20, 1989"
+.AT 3
+.SH NAME
+plunk \- produce a plucked-string note as \(*m-law data
+.SH SYNOPSIS
+.B plunk
+[\fB\-d\fIfactor\fR]
+[\fB\-k\fIkey\fR]
+[\fB\-p\fIperiod\fR]
+[\fB\-s\fIseed\fR]
+[\fB\-t\fIdur\fR]
+[\fB\-v\fIvel\fR]
+[files]
+.SH DESCRIPTION
+\fIPlunk\fP uses the Karplus-Strong routine \fIipluck()\fP to generate
+a data stream representing a plucked-string note in \(*m-law format
+suitable for /dev/audio.
+.IP \-d
+Set damping to \fIfactor\fP; 1 makes a short note; 6 makes a long note.
+The default is 4.
+.IP \-k
+Set the pitch period to that for the specified MIDI \fIkey\fP which may be
+either symbolic (e.g. ``G3'') or numeric (e.g. ``67'').
+The default is \fB\-kC3\fP (middle C).
+.IP \-p
+Set the pitch period to the specified (real) number.
+.IP \-s
+Set the random number seed to \fIseed\fP.
+The Karplus-Strong algorithm is dependent on the random number generator.
+The default is \fB\-s12345\fP.
+.IP \-t
+Set the note duration to the specified \fIdur\fP, in seconds.
+The default is \fB\-t1\fP.
+.IP \-v
+Set the note velocity (volume) to \fIvel\fP.
+The legal range is 0 to 127.
+The default is \fB\-v64\fP.
+.SH SEE ALSO
+audgen(3), mpu2aud(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

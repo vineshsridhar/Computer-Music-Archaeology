@@ -1,0 +1,269 @@
+.TH BSCOMP 3  MIDI
+.SH NAME
+bscomp(), bsinit(), bsidmp(), bssys() \- compose music a la IMG
+.SH SYNOPSES
+.Cs +0
+cc ... \-lmidi
+.sp
+#define	BS	/* to include BS stuff from libamc.h */
+#include	<midi.h>
+.sp
+bsinit()
+.sp
+bscomp(sp, frames, seed, lock, debug, opts, mchn, mkey, kmap, tmpfil)
+STYLE	*sp;			/* current style */
+int	frames;			/* length in 30ths of a second */
+int	seed;			/* random seed for lead generation */
+int	lock;			/* lock bits */
+int	debug;			/* debug bits */
+int	opts;			/* optimize bits */
+int	mchn, mkey;		/* channel & key for metronome */
+char	*kmap[NUMC];		/* drum key maps */
+char	*tmpfil;		/* root of file names */
+.sp
+bsidmp(sp, file, cntin, mchn, mkey)
+STYLE	*sp;			/* current style */
+char	*file;			/* where to write it */
+int	cntin;			/* how much count-in */
+int	mchn, mkey;		/* channel & key for metronome */
+.sp
+bssys(buf)
+char	*buf;			/* command */
+.Ce
+.SH DESCRIPTION
+These routines form the core of the composition function is \fIIMG\fP(1).
+\fIBsinit\fP performs global initializations.
+\fIBscomp\fP ``composes'' music and assembles the realization of that music
+(in MPU format) in a file.
+Composition takes place in three stages.
+First, the harmonic structure is designed
+to fit the style, using \fImkcc\fP(1).
+Second, an accompaniment is assembled
+to fit the harmonic structure and the style, using \fIacca\fP(1).
+Finally, a melody line is composed
+to fit the harmonic structure and the style, using \fIaccl\fP(1).
+\fIBsidmp\fP generates the preamble to the MPU file produced by \fIbscomp\fP
+containing program change MIDI commands to set the instrument voices,
+a metronomic ``count-in'' (if requested), etc.
+\fIBssys\fP executes shell commands and provides (optional) diagnostic
+trace output.
+.PP
+When the file ``libamc.h'' (included by ``midi.h'') is included
+in a source file and the symbol ``BS'' has been defined,
+the following definitions are in effect (among others).
+.Cs
+#ifdef	BS
+#define	MAXNDP	4	/* max number of drum parts */
+#define	NUMS	32	/* max number of styles */
+#define DBG	if(Debug)fprintf
+		/* channel numbers in the BS accompaniment files */
+#define	BCHAN	2
+#define	CCHAN	3
+#define	DCHAN0	10
+#define	DCHAN1	11
+#define	DCHAN2	12
+		/* Dbug, Lock, & Opts toggle masks */
+#define	M_MKCC	0x0001
+#define	M_ACCA	0x0002
+#define	M_ACCL	0x0004
+#define	M_BS	0x0008
+#define	M_LEN	0x0008		/* note overlap */
+		/* D110 default channels */
+#define	DEFBC	2
+#define	DEFCC	3
+#define	DEFDC	10
+#define	DEFLC0	4
+#define	DEFLC1	5
+#define	DEFLC2	6
+.Ce
+.Cs
+typedef	struct	stylstr	{
+	char	name[6];	/* for programs */
+	int	barlen;		/* bar length (MPU clocks) */
+	int	units;		/* length quantum (MPU clocks) */
+	int	dpchn[4];	/* drum part source chans (1:16) */
+	char	desc[32];	/* description (for menu) */
+	char	lname[16];	/* for people (files & button labels)*/
+	int	key;		/* current key (0:11) */
+	int	cnti;		/* current count-in in measures (0:2) */
+	char	leng[10];	/* current length */
+	int	tempo;		/* current tempo (20:240) */
+/* synth-specific */
+	int	linst[3];	/* lead instruments (1:128) */
+	int	lchan[3];	/* lead chans (1:16) */
+	int	lvolu[3];	/* lead chan volumes (1:127) */
+	int	lvelo[3];	/* lead velocities (1:127) */
+	int	ltrns[3];	/* lead transpositions (0:4) */
+	int	lener;		/* lead energy (0:100) */
+	int	lpred;		/* lead predictability */
+	int	lsfix;		/* lead seed fixed or random */
+	char	lseed[16];	/* lead seed */
+	int	binst;		/* bass inst (1:128) */
+	int	bchan;		/* bass chan (1:16) */
+	int	bvolu;		/* bass chan volume (1:127) */
+	int	bvelo;		/* bass velocity (1:127) */
+	int	btrns;		/* bass transposition (0:4) */
+	int	cinst;		/* chording inst (1:128) */
+	int	cchan;		/* chord chan (1:16) */
+	int	cvolu;		/* chord chan volume (1:127) */
+	int	cvelo;		/* chord velocity (1:127) */
+	int	ctrns;		/* chord transposition (0:4) */
+	int	dinst;		/* drum inst (1:128) */
+	int	dchan;		/* drum chan (1:16) */
+	int	dvolu;		/* drum chan volume (1:127) */
+	int	dvelo;		/* drum velocity (1:127) */
+	int	dpart;		/* drum part (0:3) */
+} STYLE;
+.Ce
+.Cs
+#define	UNAVAIL		0	/* used in tempo field of STYLE */
+
+extern	char	*Tmpfile;	/* root for intermediate file names */
+extern	char	Sysbuf[];	/* for sys() calls */
+extern	int	Debug;		/* for trace output */
+extern	int	Accaok;		/* is Tmpfile.acc up to date? */
+extern	int	Acclok;		/* is Tmpfile.lead up to date? */
+extern	int	Mkccok;		/* is Tmpfile.cc up to date? */
+#endif	BS
+.Ce
+
+.SH bsinit()
+\fIBsinit\fP takes no arguments.  And at the moment it does nothing.
+.SH bscomp(sp, frames, seed, lock, debug, opts, mchn, mkey, kmap, tmpfil)
+\fIBscomp\fP requires a large number of parameters to define
+the composition process.
+They are passed as arguments and consist of:
+.IP sp
+``sp'' is a STYLE pointer; the STYLE data type defines parameters
+having to do both with the musical style and the synthesizer equipment
+on which the piece will be played.  \fIIMG\fP(1) uses the style data
+provided by \fIbsstyle\fP(3), but any STYLE can be used.
+.IP frames
+``frames'' is the length of the piece to be composed, expressed in
+thirtieths of a second.  \fIBscomp\fP will compose a piece that takes
+\fIexactly\fP this long when played at the tempo specified by
+sp->tempo (depending on how you measure the length).
+.IP seed
+``seed'' is the random seed used to initialize the melody generation
+routines.  \fIBscomp\fP simply passes it on to \fIaccl\fP; you must
+reset it yourself if you want it to change.
+.IP lock
+``lock'' is the logical OR of bits for the processes which should NOT
+be run (possibilities are M_MKCC, M_ACCA, and M_ACCL).
+.IP debug
+``debug'' is the logical OR of bits for the processes for which diagnostic
+trace output is desired (possibilities are M_MKCC, M_ACCA, and M_ACCL).
+.IP opts
+``opts'' is the logical OR of bits for the processes which should NOT
+be run if their associated ``ok'' global is set.
+The possibilities (and their associated ``ok'' globals) are:
+M_MKCC (Mkccok), M_ACCA (Accaok), and M_ACCL (Acclok).
+The ``ok'' globals are used as flgs to indicate which routines \fIneed\fP
+to be run; e.g. \fIbscomp\fP sets Mkccok and clears Accaok
+when it runs \fImkcc\fP.
+This parameter is provided so that programs that wish to rerun all the
+composition steps whether or not anything has changed may do so
+(e.g. by default, \fIIMG\fP(1) redesigns the harmonic structure on every
+invocation).
+.IP mchn
+``mchn'' is the MIDI channel used for the metronome count-in
+(if requested by sp->cnti).
+.IP mkey
+``mkey'' is the MIDI key number used for the metronome count-in
+(if requested by sp->cnti).
+.IP kmap
+``kmap'' is an array of sixteen string pointers.
+Each string is the key map for the associated MIDI channel.
+See the description of \fIkmap\fP(1) for the format of the strings.
+These are used for converting the default Roland D110 drum parts for other
+drum synthesizers.  For example, the following key map converts drum parts
+for use with a Yamaha RX11 drum machine:
+.Cs +0
+0=32 76=33 45=36 52=38 54=39 49=40 57=42 48=43 59=46 50=47 60=49 62=51 61=52 58=54 61=55 72=65 74=67 75=68 56=69 78=71 0=75 84=95
+.Ce
+Note that any drum sound for which there is no equivalent should be mapped to 0.
+.IP tmpfil
+``tmpfil'' is the root (in the morphologic sense) of a set of files to be used.
+If tmpfil contains ``/tmp/x'' then the following files will be created or used
+(or both):
+.Cs +0
+/tmp/x.cc	The harmonic structure, expressed as a chord chart (see cc(5))
+/tmp/x.acc	The accompaniment, expressed as MPU data
+/tmp/x.lead	The melody, expressed as MPU data
+/tmp/x.mpu	The final composition, also MPU data
+.Ce
+\fIBscomp\fP returns \-1 on error, 1 if it had to adjust the tempo to meet the
+sp->units requirement, and 0 otherwise.
+.SH bsidmp(sp, file, cntin, mchn, mkey)
+\fIBsidmp\fP writes out a preamble consisting of program changes,
+volume controller changes, and any requested count-in.
+\fIBscomp\fP calls \fIbsidmp\fP when assembling the final composition,
+but \fIbsidmp\fP is also useful for such tasks as changing the voicing,
+volume, or count-in on an existing bscomp file (see examples).
+.IP sp
+``sp'' is a STYLE pointer.  It is used for channel and voice information.
+.IP file
+``file'' is a character string containing the name of the file to be written.
+.IP cntin
+``cntin'' is the length of the count-in, in beats
+(quarter notes, i.e. 120 MPU clocks each).
+.IP mchn
+``mchn'' is the MIDI channel used for the count-in
+(if cntin is non-zero).
+.IP mkey
+``mkey'' is the MIDI key number used for the count-in
+(if cntin is non-zero).
+.SH bssys(buf)
+``bssys'' calls the stdio \fIsystem()\fP routine with its buf argument.
+If debugging is turned on (i.e. the global ``Debug'' is non-zero)
+the buf argument is also sent to the stderr.
+.SH EXAMPLES
+Here is a program to compose a 36-second piece of boogie-woogie
+to be played on a Roland D110 synthesizer:
+.Cs +0
+#define	BS
+#include <midi.h>
+#include <stdio.h>
+
+	char *kmap[16];
+	int i, frames, seed, lock, debug, opts, mchn, mkey;
+	STYLE *sp;
+	extern STYLE S[], *bsstyle();
+
+	frames = 36 * 30;	/* 36 seconds */
+	seed = 12345;		/* that's random? */
+	lock = 0;		/* allow all composition steps */
+	debug = 0;		/* no debugging info */
+	opts = 0;		/* no shortcuts */
+	mchn = 10;		/* MIDI channel for count-in */
+	mkey = 75;		/* MIDI key # for count-in */
+	for (i = 16; --i >= 0; kmap[i] = (char *) 0);	/* no mapping required */
+	bsinit();
+	if (sp = bsstyle("boogi", S, 0)) {
+	    sp->cnti = 4;		/* 4 for the money */
+	    i = bscomp(sp, frames, seed, lock, debug, opts, mchn, mkey, kmap, "/tmp/x");
+	    if (i == -1)
+		fprintf(stderr, "bscomp() failed\n");
+	} else
+	    fprintf(stderr, "Unknown style: boogi\n");
+.Ce
+.PP
+The following routine will make a copy of oldfile (created by \fIbscomp\fP)
+in the file newfile with the count-in, instrument voices, and volumes
+redefined by its arguments.
+.Cs
+revoice(oldfile, newfile, sp, mchn, mkey)
+char	*oldfile, *newfile;
+STYLE	*sp;
+{
+	extern char *Sysbuf;		/* defined in bscomp.c */
+
+	bsidmp(sp, newfile, 0, mchn, mkey);
+	sprintf(Sysbuf, "bars -f0.25 <%s >>%s", oldfile, newfile);
+	bssys(Sysbuf);
+}
+.Ce
+.SH SEE ALSO
+bssetup(3), bsstyle(3), IMG(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

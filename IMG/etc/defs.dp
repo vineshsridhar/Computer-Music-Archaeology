@@ -1,0 +1,14 @@
+### All definitions for dp files ###
+#
+# Miscellaneous
+#INCLUDE	/u/psl/MIDI/etc/miscdefs.dp
+# HR16 definitions
+#INCLUDE	/u/psl/MIDI/etc/hr16defs.dp
+# RX5 definitions
+#INCLUDE	/u/psl/MIDI/etc/rx5defs.dp
+# RX11 definitions
+#INCLUDE	/u/psl/MIDI/etc/rx11defs.dp
+# RX15 definitions
+#INCLUDE	/u/psl/MIDI/etc/rx15defs.dp
+# RX21L definitions
+#INCLUDE	/u/psl/MIDI/etc/rx21defs.dp

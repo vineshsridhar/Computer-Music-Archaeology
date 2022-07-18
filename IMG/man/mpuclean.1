@@ -1,0 +1,82 @@
+.TH MPUCLEAN 1 "MIDI"
+.SH NAME
+mpuclean \- clean up mpu data
+.SH SYNOPSIS
+.B mpuclean
+[\fB\-L\fP\fI#\fP]
+[\fB\-Multiple\fP]
+[\fB\-multiple\fP]
+[\fB\-pressure\fP]
+[\fB\-tcis\fP]
+[\fB\-tcwme\fP]
+< file(s)
+.SH DESCRIPTION
+.I Mpuclean
+cleans up several common mpu data file inefficiencies/bugs:
+.PP
+1) Multiple mode commands are deleted, e.g.
+.ft L
+.nf
+ 0 90 3c 40 ;    0.000      0 kon   [ 60]=64  C4 key on
+5d 90 3c  0 ;    0.775      1 koff  [ 60]=0   C4 key off
+.ft P
+becomes:
+.ft L
+ 0 90 3c 40 ;    0.000      0 kon   [ 60]=64  C4 key on
+5d    3c  0 ;    0.775      1 koff  [ 60]=0   C4 key off
+.fi
+.ft P
+.PP
+2) Multiply re-played notes are retriggered
+(unless the \fB\-Multiple\fP or \fB\-multiple\fP arguments are used).
+Preceding each extra note-on an extra note-off is inserted and all but
+the final note-off are ignored;
+thus the sequence: \fLC4-on, C4-on, G4-on, C4-off, G4-off, C4-off\fP
+becomes: \fLC4-on, C4-off, C4-on, G4-on, G4-off, C4-off\fP.
+If \fB\-Multiple\fP is used (note capitalization),
+all extra key-ons will be removed and only the last note-off will remain
+(i.e. just the first note-on and its matching note-off are left);
+the previous sequence becomes: \fLC4-on, G4-on, G4-off, C4-off\fP.
+If \fB\-multiple\fP is used, none of the notes will be removed.
+If \fIboth\fP \fB\-multiple\fP and \fB\-Multiple\fP are used,
+extra note-ons are removed and only the \fIfirst\fP note-off remains.
+Thus the previous sequence becomes: \fLC4-on, G4-on, C4-off, G4-off\fP.
+.PP
+3) Unmatched note-offs are removed.  These are used by some programs
+to act as place holders but become "noise" when those files get
+combined.
+.PP
+4) Pressure change data is deleted unless the \fB\-pressure\fP
+(or \fB\-p\fP for short) argument is given.
+.PP
+5) ``Timing clock in stop'' messages are deleted unless the \fB\-tcis\fP
+(or \fB\-tci\fP for short) argument is given.
+.PP
+6) If the \fB\-L\fP argument is used,
+timing clock with measure end commands are inserted at intervals
+specified (in MPU clocks) by the \fB\-L\fP argument (default 480).
+.PP
+7) Multiple ``Timing clock with measure end'' messages (more than one at a
+given MPU clock time) are deleted unless the \fB\-tcwme\fP (or \fB\-tcw\fP for
+short) argument is given.
+.PP
+8) At the end of the piece, any keys that had note-ons with no corresponding
+note-offs are given note-offs and then a final TCWME is appended (without
+adding any time to the piece) if the piece didn't already end with a TCWME.
+.PP
+Example:
+.Cs
+mpuclean \-L <bach >shorter.bach
+.Ce
+performs all the processing described above
+(measure length defaults to 480 MPU clocks),
+while:
+.Cs
+mpuclean \-p <bach >shorter.bach
+.Ce
+does not remove the channel pressure codes.
+.SH SEE ALSO
+dack(1), midimode(1), select(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research
+(bellcore!psl)

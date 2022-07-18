@@ -1,0 +1,72 @@
+.TH MECHO 1 "MIDI"
+.SH NAME
+mecho - add echo to a MIDI file
+.SH SYNOPSIS
+.B mecho
+[\fB\-b\fPBARS|\fB\-c\fPCLOCKS]
+[\fB\-g\fP#.#]
+[\fB\-t\fP#]
+[echolist\fB=\fPsourcelist] ...
+< file
+.SH DESCRIPTION
+.I Mecho
+merges a copy of the key-on, key-off events from a MIDI file
+with the file.
+The copied events may be delayed, transposed, or have their key velocites
+scaled.
+.PP
+The amount of delay may either be specified in bars
+(defined as 480 MPU clocks), using \fB\-b\fP
+with a (possibly floating-point) number,
+or in MPU clocks, using \fB\-c\fP with an integer.
+Thus, \fB\-b0.5\fP and \fB\-c240\fP are equivalent.
+The delay may be zero (the default), but may not be negative.
+.PP
+If \fB\-g\fP is specified it sets the gain for the echoes.
+A gain of 127.0 or more assures that the echoes will be at maximum volume
+(key velocity 127),
+whereas a gain of 0.015 or less assures that the echoes will all
+have velocity 1.
+The default gain is 1.0.
+.PP
+The \fB\-t\fP argument may be used to transpose the echo by the specified
+number of half-steps.
+The default is a transposition of 0.
+.PP
+The echo may either appear on the same channel as the original note, or
+on another channel.
+The echolist\fB=\fPsourcelist argument(s) is(are) used to specify echo
+channel mappings.
+The lists have the same format as those used in chmap(1).
+If the lists are not of equal length, one of them must be of a single
+channel number.
+.SH EXAMPLES
+.Cs
+mecho \-c8 <lennon >yoko
+.Ce
+will add a reverberant "slap-back" sound, while
+.Cs
+mecho \-c8 \-g0.5 <lemon >okra
+.Ce
+will add an echo at one half the key velocity of the original.
+Either of:
+.Cs
+mecho \-b0.5 <scale >thirds
+tshift \-b0.5 <scale >junk; merge scale junk >thirds
+.Ce
+will double up the 1st and 3rd, 2nd and 4th, etc. quarter notes;
+while:
+.Cs
+mecho \-b0.5 \-t12 <scale >sixths
+.Ce
+will double the notes in the same way, raising the echo by an octave.
+.PP
+To have the echo of one instrument played on another instrument,
+and the echo from that instrument played on the first, you might use:
+.Cs
+play "|mecho \-b0.5 1,2=2,1 <scales"
+.Ce
+.SH SEE ALSO
+chmap(1), filter(1), merge(1), tshift(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

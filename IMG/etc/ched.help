@@ -1,0 +1,384 @@
+
+
+
+CHED(1)                  USER COMMANDS                    CHED(1)
+
+
+
+NAME
+     ched - edit MIDI file graphically
+
+SYNOPSIS
+     ched [-B#] [-b#] [-d] [-f] [-m#] [-t#] file
+
+DESCRIPTION
+     Ched produces a graphic rendition of a time-tagged MIDI file
+     and lets you edit it.  The display is similar to a score (or
+     a piano roll on its side).  Like a score, there  are  treble
+     and  base staves.  The treble staff is the one usually asso-
+     ciated with the G clef; it has horizontal lines at  E4,  G4,
+     B4,  D5,  and F5.  The bass staff is the one usually associ-
+     ated with the F clef; it has horizontal lines at A3, F3, D3,
+     B2,  and  G2.   Like a piano roll, the time and pitch dimen-
+     sions are very regular.  The pitches  are  displayed  verti-
+     cally and are given a fixed distance per half-tone, i.e. the
+     spacing is chromatic rather than diatonic.  Event times  are
+     displayed  horizontally with a constant time scale; e.g. all
+     eighth-notes take the same amount of space.
+
+Control Panel
+     The control panel at the top of the window contains a number
+     of  parameters  that  affect the display and playback of the
+     data.  To change any of the text field values you can either
+     click  on  them  with the left-hand mouse button, delete the
+     current value, and type in a new value (hit tab or return to
+     end  the entry) or use the right-hand mouse button to select
+     from a menu of common values.
+
+     OFFSET    This text field represents an MPU clock offset  at
+               which bar lines start.  It is automatically set to
+               the location of the first TCWME (Timing Clock With
+               Measure  End)  code found (mod CLOCKS/BAR, if non-
+               zero) whenever a new file is read in.
+
+     CLOCKS/BAR
+               This text field sets the number of MIDI clocks per
+               bar.   If  this  value is set to 0 then the Timing
+               Clock With Measure End codes in the data  will  be
+               used  to  determine  bar  boundaries.  The default
+               CLOCKS/BAR value is 480.
+
+     TICKS/BAR This slider selects the number  of  divisions  per
+               bar.   If  the  selection  is other than 0, dotted
+               vertical grid lines will be drawn in the appropri-
+               ate  places.   This field can be set to any useful
+               value by typing or some  standard  value  via  the
+               right-hand button menu.
+
+     TEMPO     This slider sets the rate at  which  the  data  is
+               played with the ``PLAY'' menu options.
+
+     METRONOME The two numbers after the metronome label set  the
+               rate  for metronome beeps on playback.  The second
+               number sets the duration of each  beep  while  the
+               first  sets  the  number of beeps per accent.  The
+               left-hand mouse button will  cycle  either  number
+               through  the  possibilities;  the right-hand mouse
+               button pops up a menu of choices.
+
+     SELECT    The select item offers a choice between manipulat-
+               ing notes as entities and manipulating MIDI events
+               as entities.  This is  a  subtle  difference,  but
+               very  important  when  dragging  notes  or cutting
+               parts of notes.
+
+     LEFT BUTTON
+               The default function of the left-hand mouse button
+               in  the score area is to sweep out an area (called
+               the ``selected area'') to be  manipulated  by  the
+               operations available through the middle mouse but-
+               ton.  Switching this item to ``drag'' changes  the
+               function of the left-hand mouse button to dragging
+               notes (or MIDI events) in the score area.
+
+     NON-KEY DATA
+               This choice determines what is done with the  mis-
+               cellaneous   MIDI  data  (continuous  controllers,
+               after-touch, etc.) when selected data is  sent  to
+               commands  (with  IPROC,  FILTER, etc.) The choices
+               are:  IGNORED,  to  filter  it   out   completely;
+               SELECTED,  to  send  the  non-key  data  with  the
+               selected area data; UNSELECTED, to leave the  non-
+               key  data behind; and BOTH, to include a copy with
+               the selected data and also leave a copy behind.
+
+     VELOCITY  This choice selects between making the  height  of
+               each  note  proportional  to  its key velocity and
+               making it fixed at the maximum size that will fit.
+               This  also selects whether the display in the hor-
+               izontal scroll bar will be a tiny version  of  the
+               entire  score  display  or  the relative volume of
+               each location in the score.
+
+     VU METERS A row of sixteen VU meters show which channels are
+               being  displayed  (and  are  active  for playing).
+               When ched first reads a file those  channels  that
+               contain  MIDI  data are turned ``on''.  All others
+               are turned  ``off''  (no  play  and  no  display).
+               Pointing at a VU meter and clicking the left mouse
+               button inverts its on/off state.  Pointing at a VU
+               meter and clicking the center mouse button toggles
+               grey versus black display.  The color for  display
+               of  each channel is indicated in the bottom of the
+               VU meter icon for that channel.
+
+     LOCATION MARKERS
+               At the far left and far right bottom of  the  con-
+               trol  panel are location markers giving the begin-
+               ning and ending times of the data displayed in the
+               score area.  The location markers consist of three
+               numbers in the format 0+0+000.  The first  is  the
+               number of measures (as defined by clocks/bar); the
+               second is the number of beats (at 120  clocks  per
+               beat); and the third is the number of clocks.
+
+     CNTL      The cntl button pops up a menu of continuous  con-
+               troller  numbers/channels.  Each column represents
+               a particular controller (that appears somewhere in
+               the  data)  and  each  row  represents  a  channel
+               number.   The  numbers  at  the   junctures   that
+               represent   channel/controller  combinations  that
+               don't occur in the data are drawn in grey (and are
+               not  selectable).   For  the controller data to be
+               displayed  the  CHAN  CNTL  column  must  also  be
+               selected in the menu associated with the MISC but-
+               ton; if it has not been selected,  the  number  in
+               the CNTL menu will be enclosed in parentheses (but
+               will still be selectable).
+
+     MISC      The MISC button pops up a  menu  of  non-key  MIDI
+               data/channels.    The   five   columns   represent
+               polyphonic key pressure,  continuous  controllers,
+               program  change, channel pressure, and pitch bend.
+               The rows represent all the channels present in the
+               piece.    The   numbers   at  the  junctures  that
+               represent  channel/data  combinations  that  don't
+               occur  in  the data are drawn in grey (and are not
+               selectable).  The  column  marked  ``CHAN  CNTL*''
+               determines  whether  the data selected in the CNTL
+               menu will be displayed.
+
+     HELP      The HELP button pops up a  scrolling  text  window
+               containing a complete description of the ched pro-
+               gram (unless it's out of date).
+
+     UNDO      The UNDO button undoes  the  last  operation  that
+               changed  the  data in any way.  Before doing so it
+               requires confirmation.
+
+     QUIT      The QUIT button terminates ched.  If the data  has
+               been  changed  but  not saved a confirmation panel
+               will pop up as a warning.
+
+Horizontal (Time) Scroll Bar
+     A scroll bar at the bottom shows either a  tiny  version  of
+     the  entire  score  display  or  the relative volume of each
+     location  in  the  score  with  the  area  being   displayed
+     highlighted  (depending on the setting of VMODE, see below).
+     Since ched has no way to know the decay  characteristics  of
+     the  instrument on which this will be played, it compromises
+     on a slow exponential decay with  a  half-life  of  approxi-
+     mately  25  pixels.  Sweeping out a time range with the left
+     mouse  button  depressed  defines  the  time  range  to   be
+     displayed.   Simply  clicking  the  left mouse button in the
+     bottom scroll bar causes the entire file  to  be  displayed.
+     Pointing  at  a  location  inside  the  highlighted area and
+     clicking the middle mouse button  allows  you  to  drag  the
+     highlighted  area forward and backward in time.  Pointing at
+     a location outside the highlighted area (but inside the hor-
+     izontal  scroll  bar)  and  clicking the middle mouse button
+     moves the center of the highlighted area area  to  the  time
+     selected.
+
+Vertical (Keys) Scroll Bar
+     A scroll bar at the left shows the staff lines with the  key
+     range currently being displayed highlighted.  Sweeping out a
+     key range with the left mouse button depressed  defines  the
+     lowest  and  highest  keys to be displayed.  Simply clicking
+     the left mouse button in the  left  scroll  bar  causes  the
+     entire key range (0 to 127, C-2 to G8) to be displayed.
+
+Score Area
+     The center area of the screen is used to  display  the  MIDI
+     data  in the piano-roll-like format described above.  In the
+     default case, ched makes the notes in the MIDI file fill the
+     screen  both  vertically  and horizontally, although it will
+     always include all of the treble and bass staff lines.   The
+     left mouse button is used to select notes for various opera-
+     tions.  By sweeping out an area with the  left  button,  you
+     can  define  the  beginning  and ending times and lowest and
+     highest keys for other operations.  By simply  clicking  the
+     left  mouse button, the selected area will collapse to noth-
+     ing.  When there is a selected area it will be shown  as  an
+     inverted (white on black) rectangle in the display area.
+
+     The center mouse button pops up a menu with two  columns  of
+     operations that use or affect the selected area.  These are:
+
+     PLAY      Play all  the  notes  within  the  selected  area.
+               Notes  that  extend  past the selected area on the
+               left and right will be clipped (for playing)  how-
+               ever,  only  notes that are completely enclosed in
+               the area vertically will be played.
+
+     GLOM      Select the notes that  fall  within  the  selected
+               area (usually for pasting) and put them in the cut
+               buffer.
+
+     BBOX      ``tighten up'' the selected area so it contains as
+               little  empty  space  as  possible.  Specifically,
+               move the left edge right until a key-on MIDI event
+               is  encountered;  move the right edge left until a
+               key-off MIDI event is  encountered;  set  the  top
+               edge so it is as high as it can be without includ-
+               ing any key higher than the highest  note  already
+               enclosed in the selected area; set the bottom edge
+               so it is as low as it can be without including any
+               key lower than the lowest note already enclosed in
+               the selected area;
+
+     OPEN      Open up a space equal to the width of the selected
+               area  at  the  location  (time) marked by the left
+               edge of the selected area.
+
+     INFO      Pop up a little menu describing the selected  area
+               in  terms  of beginning & ending times (in clocks,
+               beats, and bars) and lowest and highest notes  (in
+               decimal & octal).  The menu will remain and preemp
+               all other activity until you press the middle but-
+               ton again.
+
+     IPROC     Request typed input of an information command  and
+               send  the data from the selected area through that
+               command, display (as text)  the  output  from  the
+               command.  The previous IPROC command is offered as
+               a default (initially ``da'').  Note that the  data
+               being edited is unaffected by this command.
+
+     ZOOM IN   Enlarge the scale until the  selected  area  fills
+               the entire display area.  Set the selected area so
+               that selection of zoom out will restore the origi-
+               nal scale (or close to it).
+
+     BB CUT    Perform the BBOX operation immediately followed by
+               the CUT operation.  This is a useful shorthand.
+
+     PASTE     Insert the data from the  cut  buffer  (that  most
+               recently  cut,  glommed or closed) at the location
+               of the  left  edge  of  the  selected  area.   The
+               pitches  of  inserted  notes  are not altered; use
+               filter with ``transpose'' to do  that.   Also  see
+               OPEN.
+
+     CUT       Delete the notes falling within the selected area.
+               Notes  that  overlap the left and right borders of
+               the selected area will  be  clipped.   Only  notes
+               falling entirely with the selected area vertically
+               will be deleted.  Put the deleted notes in the cut
+               buffer.  Also see CLOSE.
+
+     CLOSE     Delete all notes  falling  between  the  beginning
+               time  and  ending  time  of the selected area, and
+               close up the empty space left.  Notes that overlap
+               the  left  and  right borders of the selected area
+               will be clipped.   Put  the  deleted  notes  (also
+               clipped,  if  necessary)  in the cut buffer.  Also
+               see CUT.
+
+     FILTER    Request typed input of a command and send the data
+               from  the  selected  area  through  that  command,
+               replacing the old data with the  output  from  the
+               command.  The original data from the selected area
+               is left in the cut buffer (see PASTE).
+
+     WRITE     Pop up a text window to collect the name of a file
+               and then write the selected area out.
+
+     ZOOM OUT  Shrink the scale until the entire display is  con-
+               tained  in  the  selected  area.  Set the selected
+               area so that selection of zoom in will restore the
+               original scale (or close to it).
+
+     The right mouse button pops  up  a  menu  containing  global
+     operations   that  affect  the  entire  file,  ignoring  any
+     selected area.
+
+     READ      Pop up a text window to collect the name of a file
+               and  then  read in that file for display and edit-
+               ing.
+
+     PLAY      Play the entire file.
+
+     SWEEP     The left-hand mouse button will sweep out areas in
+               the score area (as described under ``LEFT BUTTON''
+               in the Control Panel area).  This is the  opposite
+               of DRAG.
+
+     IPROC     Request typed input of an information command  and
+               send  the  data  from the entire file through that
+               command, display (as text)  the  output  from  the
+               command.  The previous IPROC command is offered as
+               a default (initially ``da'').  Note that the  data
+               being edited is unaffected by this command.
+
+     CHDIR     Prompt for a directory name and  then  change  the
+               current  working  directory  (unless ``Forget It''
+               was chosen with the  right-hand  mouse  button  in
+               response to the prompt).
+
+     WRITE     Pop up a text window to collect the name of a file
+               and then write the whole file out (unless ``Forget
+               It'' was chosen with the right-hand  mouse  button
+               in response to the text window).
+
+     UNDO      Undo the last operation that changed the  data  in
+               any way.  Prompt for confirmation before doing so.
+
+     DRAG      The left-hand mouse button will drag notes or MIDI
+               events  around  the score area (as described under
+               ``LEFT BUTTON'' in the Control Panel area).   This
+               is the opposite of SWEEP.
+
+     FILTER    Request typed input of a command and send the data
+               from the entire file through that command, replac-
+               ing the old data with the output from the command.
+               The  original  data from the selected area is left
+               in the cut buffer (also see PASTE  and  FILTER  on
+               the middle button).
+
+     QUIT      Exit from ched.
+
+Options
+     The -B option specifies the number of MPU  clocks  per  bar.
+     If  this  is  set to zero (e.g. ``-B0''), bar line placement
+     will be governed by MPU Timing Clock With Measure  End  com-
+     mands.  The default is 480.
+
+     If a number of bars is specified with the  -b  option,  that
+     many  bars (counting from the beginning of the file) will be
+     made to fill the width of the screen initially.
+
+     The -d option turns on debugging output.
+
+     The -f option suppresses ched's natural tendency  to  fork()
+     itself  off  so  the  shell  spawning  it will become active
+     again.
+
+     The -m option lets you specify a  blank  margin  around  the
+     score  and  scroll bars.  The decimal integer argument is in
+     units of pixels.
+
+     The -t option sets the number of grid  ticks  per  bar  (see
+     description of the TICKS/BAR slider, above).  The default is
+     0.
+
+     Examples: ched bach ched -m39 bach ched -B360 -b10 -t6  bach
+     The  first example displays the contents of the file bach in
+     as large a format as possible.  The second  example  indents
+     the  active  area  of  the display by 39 pixels on all sides
+     (convenient for making slides photographically).  The  third
+     example displays only the first 10 bars (with 360 MPU clocks
+     per bar) of bach.  It also specifies 6  grid  divisions  per
+     bar.
+
+BUGS
+     This editor is about 79% finished.  Many  other  refinements
+     and  additions  are contemplated, including convenient move-
+     ment of data from  channel  to  channel,  massive  speedups,
+     avoiding rewriting the screen unnecessarily, etc.
+
+SEE ALSO
+     chart(1), mfm(1), therm(1),
+
+AUTHOR
+     Peter Langston, Bell Communications Research (bellcore!psl)

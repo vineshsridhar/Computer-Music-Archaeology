@@ -1,0 +1,23 @@
+.TH MUMERGE 1 "October 20, 1989"
+.AT 3
+.SH NAME
+mumerge \- merge streams of \(*m-law audio data
+.SH SYNOPSIS
+.B mumerge
+[\fB\-\fR]
+[\fB\-a\fIdB\fR]
+[files]
+.SH DESCRIPTION
+\fIMumerge\fP reads \(*m-law audio data from two or more sources,
+merges them and writes the (optionally) attenuated sum to the standard output.
+Two optional parameters can be used:
+.IP \-
+use the standard input as one of the data streams.
+.IP \-a
+attenuate the merged sum by \fIdB\fP decibels.
+If \fIdB\fP is negative the sum will be amplified.
+The default is \fB\-a0\fP.
+.SH SEE ALSO
+aecho(1), audcnv(3)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

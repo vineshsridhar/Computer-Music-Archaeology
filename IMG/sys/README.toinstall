@@ -1,0 +1,61 @@
+To install the MIDI driver in a SunOS 4.x system:
+
+1) Copy an appropriate system configuration file from .../conf
+   to .../conf/MIDI.  Add the following lines to this file:
+
+# MIDI serial driver
+pseudo-device		zsm2
+
+
+2) Add the following line to .../conf/files:
+
+sundev/zs_midi.c optional zsm device-driver
+
+
+3) Copy the source files to /sys/sundev:
+
+cp zs_midi.c zs_proto.c midi_ioctl.h /sys/sundev
+
+
+4) Add the following to the appropriate places in .../sun/conf.c:
+
+#include "zsm.h"
+#if NZSM > 0
+extern int zsm_open(), zsm_close(), zsm_read(), zsm_write();
+extern int zsm_select(), zsm_ioctl();
+#else
+#define       zsm_open   nodev
+#define       zsm_close  nodev
+#define       zsm_read   nodev
+#define       zsm_write  nodev
+#define       zsm_select nodev
+#define       zsm_ioctl  nodev
+#endif
+
+
+    {
+      zsm_open,       zsm_close,      zsm_read,       zsm_write,      /*??*/
+      zsm_ioctl,      nulldev,        zsm_select,     nulldev,
+      0,              nulldev,
+    },
+
+
+5) Make character special device nodes in /dev for the midi devices:
+
+/etc/mknod /dev/midi0 c ?? 0		; chmod 666 /dev/midi0
+/etc/mknod /dev/midi1 c ?? 1		; chmod 666 /dev/midi1
+ln -s /dev/midi0 /dev/midi
+
+
+6) Configure, build, and boot the new kernel:
+
+cd .../conf
+/etc/config MIDI
+cd ../MIDI
+make
+mv /vmunix /vmunix.good
+cp vmunix /vmunix
+/etc/reboot
+
+8) To record, cat /dev/midi to a file.  To play, cat the file to /dev/midi.
+   Or use mpu2sun to play MPU files.

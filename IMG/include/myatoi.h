@@ -1,0 +1,1 @@
+int myatoi(char *cp);

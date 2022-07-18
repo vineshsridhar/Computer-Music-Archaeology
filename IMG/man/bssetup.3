@@ -1,0 +1,118 @@
+.TH BSSETUP 3  MIDI
+.SH NAME
+bssetload(), bssetsave() \- load and save IMG synth/style setup files
+.SH SYNOPSES
+.Cs +0
+cc ... \-lmidi
+.sp
+#define	BS	/* to include BS stuff from libamc.h */
+#include	<midi.h>
+.sp
+bssetload(ifp, stylep, synthp, numstyles)
+FILE	*ifp;		/* input file pointer */
+STYLE	*stylep;	/* pointer to STYLE vector */
+SYNTH	*synthp;	/* pointer to SYNTH struct */
+int	numstyles;	/* max number of styles */
+.sp
+bssetsave(ofp, stylep, synthp, header)
+FILE	*ofp;		/* output file pointer */
+STYLE	*stylep;	/* pointer to STYLE vector */
+SYNTH	*synthp;	/* pointer to SYNTH struct */
+char	*header;	/* header text */
+.Ce
+.SH DESCRIPTION
+\fIBssetload\fP loads IMG STYLE and SYNTH data structures
+from ``setup'' files.
+\fIBssetsave\fP saves IMG STYLE and SYNTH data structures
+to ``setup'' files.
+.PP
+The STYLE data type is defined in ``libamc.h'' (included by ``midi.h'')
+if the synbol ``BS'' is defined when it is included.
+The STYLE definition looks like:
+.Cs +0
+typedef	struct	stylstr	{
+	char	name[6];	/* for programs */
+	int	barlen;		/* bar length (MPU clocks) */
+	int	units;		/* length quantum (MPU clocks) */
+	int	dpchn[4];	/* drum part source chans (1:16) */
+	char	desc[32];	/* description (for menu) */
+	char	lname[16];	/* for people (files & button labels)*/
+	int	key;		/* current key (0:11) */
+	int	cnti;		/* current count-in (0:2) */
+	char	leng[10];	/* current length */
+	int	tempo;		/* current tempo (20:240) */
+/* synth-specific */
+	int	linst[3];	/* lead instruments (1:128) */
+	int	lchan[3];	/* lead chans (1:16) */
+	int	lvolu[3];	/* lead chan volumes (1:127) */
+	int	lvelo[3];	/* lead velocities (1:127) */
+	int	ltrns[3];	/* lead transpositions (0:4) */
+	int	lener;		/* lead energy (0:100) */
+	int	lpred;		/* lead predictability */
+	int	lsfix;		/* lead seed fixed or random */
+	char	lseed[16];	/* lead seed */
+	int	binst;		/* bass inst (1:128) */
+	int	bchan;		/* bass chan (1:16) */
+	int	bvolu;		/* bass chan volume (1:127) */
+	int	bvelo;		/* bass velocity (1:127) */
+	int	btrns;		/* bass transposition (0:4) */
+	int	cinst;		/* chording inst (1:128) */
+	int	cchan;		/* chord chan (1:16) */
+	int	cvolu;		/* chord chan volume (1:127) */
+	int	cvelo;		/* chord velocity (1:127) */
+	int	ctrns;		/* chord transposition (0:4) */
+	int	dinst;		/* drum inst (1:128) */
+	int	dchan;		/* drum chan (1:16) */
+	int	dvolu;		/* drum chan volume (1:127) */
+	int	dvelo;		/* drum velocity (1:127) */
+	int	dpart;		/* drum part (0:3) */
+} STYLE;
+.Ce
+.PP
+The SYNTH data type is also defined in ``libamc.h'' (included by ``midi.h'').
+The SYNTH definition looks like:
+.Cs +0
+/* synth-specific information (largely unneeded for composition) */
+typedef	struct	synthstr	{
+	char	name[SNLEN];	/* what the synth setup is called */
+	char	misc[128];	/* miscellaneous comment */
+	char	init[512];	/* command to initialize the synth(s) */
+	char	fini[512];	/* command to reset the synth(s) */
+	char	play[128];	/* command to "play" MPU data */
+	int	mchn, mkey;	/* default channel & key for metronome */
+	char	*kmap[NUMC];	/* MIDI key mapping (for drums) */
+#define	NOKMAP		(char *) 0
+	char	cnam[NUMC][NLEN];	/* channel names for all channels */
+	char	vnam[NUMC][NUMV][NLEN];	/* voice names for all channels */
+		/* if vnam[c][0][0] == 0, no voices available */
+#define	NOVOICES	{ 0, }
+		/* if vnam[c][0][0] > 127, use vnam[vnam[c][0][0] & 0x0F] */
+#define	USEC(c)		(0x80|((c)-1))
+} SYNTH;
+.Ce
+.PP
+IMG setup files contain ascii versions of this information.
+The best way to understand this format is to look at an existing
+setup file.  One way is to examine files with names ending in ``.setup''
+in the directory ``/u/psl/MIDI/BS/etc.''  Another way is to run a program
+like \fIIMG\fP(1) and use the ``save setup'' button to create a new
+setup file and then compare it to the parameters in IMG.
+.SH bssetload(ifp, stylep, synthp, numstyles)
+\fIBssetload\fP should be passed an file pointer opened for reading (ifp)
+and positioned at the beginning of a setup file.
+If either stylep or synthp are NULL
+the corresponding information in the file will be ignored.
+Numstyles is the maximum number of style entries that will fit in the vector
+of STYLE structs pointed to by stylep.
+.SH bssetsave(ofp, stylep, synthp, header)
+\fIBssetsave\fP should be passed an file pointer opened for writing (ofp)
+at the beginning of a file.  If either stylep or synthp are NULL
+the corresponding information will not be written out.
+Header is an ascii string (typically containing identifying information)
+to be included in a comment at the start of the file.
+.SH FILES
+/u/psl/MIDI/BS/etc/*.setup	sample style/synth setup files
+.SH SEE ALSO
+bscomp(3), bsstyle(3), IMG(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

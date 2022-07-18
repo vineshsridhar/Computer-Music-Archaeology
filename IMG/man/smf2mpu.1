@@ -1,0 +1,43 @@
+.TH SMF2MPU 1 "MIDI"
+.SH NAME
+smf2mpu - convert Standard Midi File format to MPU format
+.SH SYNOPSIS
+.B smf2mpu
+[\fB-v\fP] <smf-file >mpu-file
+.SH DESCRIPTION
+\fISmf2mpu\fP is a very simple program to interpret Midi File Standard (SMF)
+files and convert them to time-tagged MPU files.
+It has several limitations: it only understands format 0 files and
+it only converts track data (the rest is flushed).
+\fISmf2mpu\fP does decipher the time division information in the SMF 
+header chunk and it interprets the Tempo Meta-event (by scaling the time-tags).
+.PP
+The \fB\-v\fP option provides diagnostic output describing all non-MIDI
+events encountered.
+.PP
+\fISmf2mpu\fP uses the routine \fIgetsmcmd()\fP to do most of the conversion
+work; see getsmcmd(3).
+.SH EXAMPLE
+.Cs
+% bbtoax <x.smf
+4d 54 68 64 00 00 00 06 00 00 00 01 00 78 4d 54
+72 6b 00 00 00 17 00 ff 51 03 09 27 c0 00 ce 1b
+86 48 9e 34 47 6c 9e 34 00 0c ff 2f 00 
+% smf2mpu -v <x.smf >x.mpu
+120 clocks/beat
+stdin: track chunk length = 23
+tempo META event, 600000 ms/beat
+EOT META event at when=960
+% da -T x.mpu
+ 0 ce 1b    ;      0      0 progc [ 15]=28  program
+   f8       ;    240      1 tcip            timing clock
+   f8       ;    480      2 tcip            timing clock
+   f8       ;    720      3 tcip            timing clock
+78 9e 34 47 ;    840      4 kon   [ 52]=71  E2 key on
+6c 9e 34  0 ;    948      5 koff  [ 52]=0   E2 key off
+ c f8       ;    960      6 no-op           mpu no-op
+.Ce
+.SH SEE ALSO
+bbtoax(1), da(1), getsmcmd(3), mpu2smf(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

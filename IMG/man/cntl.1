@@ -1,0 +1,29 @@
+.TH CNTL 1 "MIDI"
+.SH NAME
+cntl - generate MIDI channel control commands
+.SH SYNOPSIS
+.B cntl
+[\fB-d\fP#] chan\fB,\fPcntl\fB=\fPvalu ...
+.SH DESCRIPTION
+.I Cntl
+generates "control" commands to set control parameters on one or
+many MIDI channels.
+\fIChan\fP is a decimal number from 1 to 16,
+\fIcntl\fP is a decimal number from 0 to 127,
+and \fIvalu\fP is a decimal number between 0 and 127 (inclusive).
+Example:
+.Cs
+play "|cntl 1,5=0 16,7=32"
+.Ce
+If a Casio CZ-101 is assigned MIDI channel 1 and a Yamaha DX7 is assigned
+MIDI channel 16, this command will set the portamento time to 0 on
+the CZ-101, and set the volume to 32 (half) on the DX7.
+.PP
+By default, the control change code(s) will be followed by a pause
+(120 MIDI clocks).
+The \fB-d\fP option sets the amount of delay;
+\fB-d0\fP suppresses the delay altogether.
+.SH SEE ALSO
+chmap(1), chpress(1), cntlseq(1), inst(1), pbend(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

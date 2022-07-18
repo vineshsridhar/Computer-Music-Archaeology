@@ -1,0 +1,84 @@
+This is the STANDALONE sparcstation version of IMG and some misc audio
+editing tools, written by Peter langston, edited and packaged by
+Stephen Uhler.  This package represents only one part of a larger
+collection of work, that may be released at a later date.   This
+software was written about 1986; the current packaging was done in
+1989.
+
+The Programs fall into 4 categories:
+
+1) Stuff needed for IMG, the automated computer composition system
+
+bssa	stand-alone (non-window) version of IMG
+mkcc acca accl inst cntl mpuclean merge:
+	IMG support routines, not usually called directly
+
+2) Stuff that operates on time-tagged (mpu) midi data
+
+select		"grep" for midi data. Select channels, etc.
+transpose	transpose midi data by pitch
+chmap		remap midi channels
+invert		pitch inversion of mid data
+mecho		add echo to midi data
+just		quantize the tempo of a midi piece
+unjust		randomize the tempo of a midi piece
+da		midi dissassembler
+
+3) Stuff that operates on sparc Mu-law audio data
+
+aecho		add an echo
+agc		automatic gain control
+avmap		change the volume
+gate		zero out quiet passages
+mumerge		merge multiple audio streams (mixer)
+norm		normalize volume
+reverb		add reverberation
+squelch		remove quiet passages
+
+4) routines for format conversion
+
+mpu2aud		convert time tagged midi to sparcstation mu-law
+mpu2smf		convert time-tagged midi to standard midi file format
+mpu2sun		convert time tagged midi to SUN midi driver format
+plunk		convert a "plucked string" to sparcstation mu-law
+smf2mpu		convert standard midi file format to time tagged midi
+
+
+NOTES:
+
+*  The stuff in sys, is a midi driver for 4.1 sarcstations.
+   With this driver you can use your serial ports to generate
+   midi, only the level converter is required.  The mpu2sun
+   utility converts peters MPU format to the sun midi driver
+   format
+
+* The etc/ and obj/ directories are used by IMG, see the enclosed readme
+  files
+
+* The stuff in tunes are sample midi files in MPU format
+
+* IMG stands for Incidental Music Generator.  The package has been known 
+  by other names in the past.
+
+* Some things to try:
+
+1) < tunes/<something>.mpu mpu2aud > /dev/audio
+   plays a tune on the sparcstation, using "pluck"
+2) < tunes/<something>.mpu mpu2sun > /dev/midi
+   play the tune to a midi device, out the serial port
+3) bssa -l25 grass | mpu2aud > /dev/audio
+   Composes 25 seconds of blue-grass, and sends it to the speaker.
+
+* Installation instructions
+  - set BASE in the makefile
+  - run make FLAG=-O, then make install
+  - This software was tested on SUN-OS 4.x using the bundled C compuler
+
+* See also "sparcOmatic", avaliable on bellcore.com for some
+  related music tools
+
+* Peter Langston can be reached at:  psl@acm.org
+
+Stephen Uhler
+sau@bellcore.com
+11/1/93

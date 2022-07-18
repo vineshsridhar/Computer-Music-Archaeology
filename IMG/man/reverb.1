@@ -1,0 +1,47 @@
+.TH REVERB 1 "October 26, 1989"
+.AT 3
+.SH NAME
+reverb \- generate reverberation for \(*m-law audio data
+.SH SYNOPSIS
+.B reverb
+[\fB\-g\fIdB\fR]
+[\fB\-r\fIsec\fR]
+[\fB\-s\fI#\fR]
+[\fB\-t\fIdB\fR]
+.SH DESCRIPTION
+\fIReverb\fP reads \(*m-law audio data from
+the standard input and writes a reverberated copy
+to the standard output.
+The algorithm uses four modified comb filters in parallel to generate
+reverberation with controlled decay times.
+This technique generates similar results to that in rev(1), but is
+much faster.
+.IP \-g
+set the reverberation attenuation to \fIdB\fP decibels.
+Setting this value lower (less attenuation) will make the sound source
+seem farther away; setting it higher (more attenuation, so less reverb
+``in the mix'') will make the sound source seem more ``present.''.
+The default is \fB\-g6\fP.
+.IP \-r
+set the reverberation time to the specified number of seconds.
+Reverberation time is the time it takes the reverberation to die down to
+\(ap0.1% of the original signal (60 dB down).
+The default is \fB\-r1.0\fP (characteristic of a fairly live chamber).
+.IP \-s
+set the room size to \fI#\fP.
+The values range from 1 (small room) to 9 (large room).
+This parameter sets the lengths of the shift registers in the four comb filters
+used to make the reverberation.
+The default is \fB\-s5\fP.
+.IP \-t
+set the ending threshold to \-\fIdB\fP decibels.
+Since the reverberation will extend beyond the end of the original sound sample
+some level must be chosen at which the output can be called silent.
+When the output drops to \fIdB\fP decibels down from the maximum, the output
+will be allowed to stop.
+The default is \fB\-t30\fP which is \(ap3% of full scale (the standard
+for professional audio work is 60 dB, \(ap0.1% of full scale).
+.SH SEE ALSO
+aecho(1), allpass(3), comb(3), rev(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

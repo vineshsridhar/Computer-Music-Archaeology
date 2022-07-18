@@ -1,0 +1,65 @@
+.TH KEY2NAME 3  MIDI
+.SH NAME
+key2name, name2key, key2pc, pc2key, sh2ks \- convert key names to MIDI numbers & vice-versa
+.SH SYNOPSIS
+.Cs +0
+cc ... \-lmidi
+.sp
+char *key2name(key)
+int key;
+.sp
+int name2key(name)
+char *name;
+.sp
+char *key2pc(key)
+int key;
+.sp
+int pc2key(name)
+char *name;
+.sp
+char *sh2ks(sharps)
+int key;
+.Ce
+.SH DESCRIPTION
+\fIKey2name(key)\fP
+returns a pointer to a static char buffer containing the name of the key
+specified as a MIDI key number in \fIkey\fP.
+Accidentals will always be returned as flats
+(e.g. key2name(61) returns ``Db3'').
+.PP
+\fIName2key(name)\fP
+returns the MIDI key number for the specified ascii key name.
+Both sharps and flats are recognized, as are double sharps, etc.
+(e.g. name2key("C###3") returns 63 decimal).
+Octaves may have any value from ``-2'' to ``8''.
+On error, \fIname2key(name)\fP returns -1 if the pitch class letter was
+bad (i.e. not in {A,B,C,D,E,F,G}), or -2 if the octave was outside the
+range -2 to 8.
+.PP
+\fIKey2pc(key)\fP
+returns a pointer to a static char buffer containing the name of the
+key's pitch class (a pitch with no octave specified).
+Key is specified as a MIDI key number in \fIkey\fP.
+Accidentals will always be returned as flats (e.g. key2pc(61) returns ``Db'').
+.PP
+\fIPc2key(name)\fP
+returns the MIDI key number for the specified ascii pitch class name.
+Both sharps and flats are recognized, as are double sharps, etc.
+(e.g. pc2key("C###") returns 3).
+Although this was designed specifically for ``names'' (i.e. those beginning
+with upper-case alphabetics), it will also interpret numeric values such as
+``1'', ``61'', ``075'', ``0x3d'', ``+13'', and ``-11''; all of which are
+equivalent to ``Db''.
+If the value passed to \fIpc2key(name)\fP can not be interpreted as any of
+these forms, -1 will be returned.
+.PP
+\fISh2ks(sharps)\fP
+returns a pointer to a static char buffer containing the name of the
+key signature with the specified number of \fIsharps\fP.
+A negative number is used to indicate flats.
+The normal range for \fIsharps\fP is -7 (``Cb'') to +7 (``C#''),
+however key signatures as extreme -12 (``Dbb'') and +12 (``B#'') are provided.
+Values outside this range are folded back in
+(e.g. -17 sharps \(== -5 sharps \(== 5 flats \(== ``Db'').
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

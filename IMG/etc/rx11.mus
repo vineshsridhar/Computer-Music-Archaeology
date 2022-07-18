@@ -1,0 +1,12 @@
+# RX11/RX21L setup for mustat
+#inst	chan	field	lo:hi	minv:maxv
+0x2d	2	Fsy	0:999	20:120	bass drum - system page faults
+0x32	2	Fin	0:999	10:50	tom-tom 2 - device interrupts
+0x36	2	Fin	99:300	20:75	claps - device interrupts
+0x39	2	Fcs	9:100	20:80	closed hihat -context switches
+0x35	2	Cus	0:100	10:120	tom-tom 1 - user time
+0x31	2	Csy	0:100	5:80	snare drum - system time
+0x3C	2	Pb	1:8	25:90	crash cymbal - blocked processes
+0x37	2	Pr	1:10	25:80	cowbell - runnable processes
+0x46	2	Pw	1:5	60:120	timbale - runnable but swapped
+1	0	0	100:0	180:80	Tempo - inverse idle time

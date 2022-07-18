@@ -1,0 +1,96 @@
+.TH STRINGS 3  MIDI
+.SH NAME
+strcopy, scopy, strpeel, speel, strtolower, strtoupper \- string operations
+.SH SYNOPSIS
+.Cs +0
+char	*
+strcopy(to, from)
+char	*to, *from;
+.sp
+char	*
+scopy(from, to)
+char	*from, *to;
+.sp
+char	*
+strpeel(sp, dels)
+char	*sp, *dels;
+.sp
+char	*
+speel(spp, dels)
+char	**spp, *dels;
+.sp
+char	*
+strtolower(sp)
+char	**sp;
+.sp
+char	*
+strtoupper(sp)
+char	**sp;
+.sp
+.SH DESCRIPTION
+These functions operate on null-terminated strings.
+They do not check for overflow of any receiving string.
+.PP
+Both \fIstrcopy()\fP and \fIstrcopy()\fP copy the string *\fBfrom\fP
+into the location *\fBto\fP
+and return a pointer to the terminating null.
+Typical usage:
+.Cs
+char buf[128], *filename;
+
+strcopy(strcopy(strcopy(buf, "The file name is '"), filename), "'\n");
+.Ce
+.PP
+\fIStrpeel()\fP isolates the first ``word'' in the string *\fBsp\fP,
+terminates it with a null (modifying the string whose address was passed)
+and returns a pointer to the remainder of the string.
+\fBDels\fP is a null-terminated string of delimiters;
+if \fBdels\fP is \fL(char *) 0\fP then delimiters are all chars equal to
+or smaller than the space character (all non-graphic & whitespace characters).
+.Cs
+register char *bp, *cp;
+
+for (bp = buf; *bp; ) {
+	bp = strpeel(cp = bp, (char *) 0);
+	.	/* cp points to <NUL> terminated word */
+	.	/* bp points to unterminated next word */
+}
+.Ce
+Note that testing for no-more-words can be done either by testing \fL*cp\fP
+before using it or by testing \fL*bp\fP before calling \fIstrpeel()\fP.
+On return from \fIstrpeel()\fP \fBbp\fP should always point to a valid
+null-terminated string (even if it's empty).
+.PP
+\fISpeel()\fP is similar to \fIstrpeel()\fP in function except it
+takes the address of a pointer to the subject string as an argument and
+returns a pointer to the isolated ``word'', having modified the pointer
+to the subject string.
+.Cs
+register char *cp;
+char *bp;
+
+for (bp = buf; *(cp = speel(&bp, (char *) 0)); ) {
+	.	/* cp points to <NUL> terminated word */
+	.	/* bp points to unterminated next word */
+}
+.Ce
+As before, testing for no-more-words can be done either by testing \fL*cp\fP
+before using it or by testing \fL*bp\fP before calling \fIspeel()\fP.
+On return from \fIspeel()\fP both \fBbp\fP and \fBcp\fP should always point
+to a valid null-terminated string (even if they are empty).
+.PP
+\fIStrtolower()\fP converts all alphabetic characters in the string passed
+it to lower case and returns a pointer to the string.
+.PP
+\fIStrtoupper()\fP converts all alphabetic characters in the string passed
+it to upper case and returns a pointer to the string.
+.SH WARNINGS
+\fIStrpeel()\fP and \fIspeel()\fP assume that all non-graphic whitespace
+characters can be identified with the test: \fLc <= ' '\fP.
+This is, of course, in error in the case of <DEL> (hex 0x7F), and may be
+in worse error if a non-ascii character set it being used.
+.SH SEE ALSO
+string(3)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)
+Michael Hawley, Lucasfilm Ltd. (dagobah!mike)

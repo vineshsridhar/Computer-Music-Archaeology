@@ -1,0 +1,120 @@
+.TH SELECT 1 "MIDI"
+.SH NAME
+select \- select specified portions of MIDI data
+.SH SYNOPSIS
+.B select
+[\fB\-c\fP#[\fB\-\fP#]]
+[\fB\-k\fP#[\fB\-\fP#]]
+[\fB\-v\fP#[\fB\-\fP#]]
+[\fB\-A\fP]
+[\fB\-C\fP#[\fB\-\fP#]]
+[\fB\-P\fP#[\fB\-\fP#]]
+[\fB\-B\fP]
+[\fB\-S\fP#[\fB\-\fP#]]
+[\fB\-only\fP]
+[\fB\-allbut\fP]
+<file1 >file2
+.SH DESCRIPTION
+.I Select
+reads MIDI command streams
+and passes through those portions that meet the specified selection criteria.
+Selection can be based on any combination of criteria: channel,
+key (note), key velocity, and status commands.
+.PP
+Unless the \fB\-only\fP argument is used, the defaults are to let everything
+through (equivalent to:
+\fB\-c1\-16 \-k0\-127 \-v0\-127 \-C0\-127 \-P1\-128 \-S0\-15\fP).
+When an argument is specified, the corresponding default argument is ignored,
+thus \fB\-c3\fP overrides \fB\-c1\-16\fP in the default.
+When \fB\-only\fP is used, the default is to let nothing through
+(equivalent to: \fB\-c \-k \-v \-C \-P \-S\fP).
+.PP
+The \fB\-allbut\fP option complements the selection criteria, however it does
+not complement the effect of \fB\-only\fP; (see the examples).
+.PP
+The \fB\-c\fP argument specifies one or more channel numbers to be selected.
+\fB\-c1\fP selects the first MIDI channel, \fB\-c1\-16\fP selects all MIDI
+channels (the default).  To select disjoint ranges of channels use more than
+one argument: e.g. \fB\-c2 \-c4\fP selects the second and fourth MIDI channels.
+.PP
+The \fB\-k\fP argument specifies one or more notes (keys) to be selected.
+\fB\-k60\fP selects C4 (or cymbal crash on an RX11/15), \fB\-k0\-127\fP selects
+all the notes (the default).  To select disjoint ranges of notes use more than
+one argument as described above.
+.PP
+The \fB\-v\fP argument specifies one or more key velocities to be selected.
+\fB\-v64\fP selects only notes played with a velocity of 64, \fB\-v1\-127\fP
+selects all key velocities (the default).
+Note that key velocity 0 is \fIalways\fP selected since many MIDI devices
+use a key velocity of 0 to indicate key-off.
+To remove the unneeded key-off commands after filtering out some key-on
+commands, use mpuclean(1).
+To select disjoint ranges of key velocities use more than one argument
+as described above.
+.PP
+The \fB\-C\fP argument specifies a control change command to be selected.
+\fB\-C1\fP selects modulation wheel commands;
+\fB\-C2\fP selects breath control commands;
+\fB\-C3\fP selects foot control commands;
+\fB\-C7\fP selects volume commands;
+\fB\-C\fP deselects all control change commands;
+\fB\-C1\-4 \-C6\-128\fP selects all but portamento commands;
+et cetera.
+.PP
+The \fB\-P\fP argument specifies a program change command to be selected.
+\fB\-P1\fP selects program 1 change commands;
+\fB\-P\fP deselects all program change commands;
+\fB\-P1\-5 \-P7\-128\fP selects all but program 6 change commands;
+et cetera.
+.PP
+The \fB\-A\fP argument deselects polyphonic after-touch messages.
+.PP
+The \fB\-B\fP argument deselects pitch-bend messages.
+.PP
+The \fB\-S\fP argument specifies a system message command to be selected.
+\fB\-S0\fP selects system exclusive messages;
+\fB\-S2\fP selects song position pointer messages;
+\fB\-S3\fP selects song select messages;
+\fB\-S6\fP selects tune request messages;
+\fB\-S7\fP selects end-of-SystemExclusive messages;
+\fB\-S8\fP selects timing clock messages;
+\fB\-S9\fP selects 0xf9 messages (used by the Roland MPW-401 and
+MPU-401-compatible devices for ``timing clock with measure end'');
+\fB\-S10\fP selects start messages;
+\fB\-S11\fP selects continue messages;
+\fB\-S12\fP selects stop messages;
+\fB\-S14\fP selects active sensing messages;
+\fB\-S15\fP selects system reset messages;
+To select several kinds of system messages use several \fB\-S\fP arguments.
+.PP
+All MIDI data are read from the standard input and written on the
+standard output.
+.PP
+.SH EXAMPLES
+.Cs
+select \-c1\-2 <bach >rebach
+.Ce
+This command will copy all MIDI commands from bach that refer to channels
+1 or 2 (and any commands that don't refer to channels at all).
+.Cs
+select \-k0\-63 <bach >lobach
+select \-allbut \-k0\-63 <bach >hibach
+.Ce
+These commands will split "bach" into "lobach" and "hibach" containing the
+left and right halves of the keyboard respectively.
+Note that both files created will contain whatever miscellaneous program changes
+or other, non-key-related MIDI commands appeared in the original file.
+.Cs
+select \-v10\-127 <bach >bebach
+.Ce
+This will filter out all the very quiet notes.
+.Cs
+select \-allbut \-only \-c1
+select \-only \-c2\-16
+.Ce
+These two commands do the same thing.
+.SH SEE ALSO
+chmap(1), filter(1), kmap(1), mpuclean(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research
+(bellcore!psl)

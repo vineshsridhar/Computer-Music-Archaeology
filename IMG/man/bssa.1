@@ -1,0 +1,62 @@
+.TH BSSA 1 "MIDI"
+.SH NAME
+bssa - stand-alone version of IMG
+.SH SYNOPSIS
+.B bssa
+[\fB\-c\fR[\fIfile\fR]]
+[\fB\-l\fI##\fR[\fBf\fR|\fBs\fR|\fB:\fI##\fR]]
+[\fB\-o\fIfile\fR]
+[\fB\-s\fR[\fIfile\fR]]
+[\fB\-v\fR[\fIfile\fR]]
+\fIstyle\fP
+[\fB>\fImpu_output\fR]
+.SH DESCRIPTION
+.I Bssa
+uses the routines in \fIbscomp\fP(3), \fIbssetup\fP(3), and \fIbsstyle\fP(3)
+to compose music in the manner(s) described in the documentation for
+\fIIMG\fR(1).
+The major difference between \fIbssa\fP and \fIIMG\fP is that
+\fIbssa\fP has no screen interface and is not interactive.
+So read the documentation on \fIIMG\fP(1), \fIbscomp\fP(3),
+\fIbssetup\fP(3), and \fIbsstyle\fP(3) and you'll be able to guess the rest.
+.IP -c
+The \fB\-c\fP argument can be used to create a command file to play the
+resulting piece.  If the \fIFILE\fP specification is missing, the command
+file will be sent to the standard error output (stderr).
+If no \fB\-o\fP argument appears (so the program does not know the name
+of the resulting MPU file), the command file generated will expect the
+MPU data to be provided as the standard input (stdin).
+.IP -l
+The \fB\-l\fP argument determines the length of the generated piece.
+The length can be specified as seconds or video frames (30 per second) or
+a combination of both.  Running ``bssa -times'' will give a list of examples.
+Each style has a default length (in case no \fB\-l\fP argument appears).
+.IP -o
+The \fB\-o\fP argument directs \fIbssa\fP to put the MPU output in the
+specified file.  Unlike the other arguments that take file names, \fB\-o\fP
+\fIrequires\fP a file name.
+If no \fB\-o\fP argument appears, the MPU output will be sent
+to the standard output (stdout).
+.IP -s
+The \fB\-s\fP argument specifies a IMG-style setup file.
+These files define style and synthesizer parameters.
+See \fIbssetup\fP(3) for further information.
+If the \fIFILE\fP specification is missing, the setup file will be read from
+the standard input (stdin).
+The default synthesizer setup is for a Roland D110.
+.IP -v
+The \fB\-v\fP argument can be used to generate a verbose description of the
+piece composed.
+If the \fIFILE\fP specification is missing, the description
+will be sent to the standard error output (stderr).
+.IP style
+Style must be one of the five-character style names in the current style
+database (which is affected by the \fB\-s\fP option).
+Running ``bssa [\fB\-s\fR[\fIfile\fR]] help'' should give you a list.
+The \fIstyle\fP argument is required; there is no default style.
+.SH FILES
+/u/psl/MIDI/BS/etc/*.setup	sample style/synth setup files
+.SH SEE ALSO
+bscomp(3), bssetup(3), bsstyle(3), ddmt(1), IMG(1), sbsd(3)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

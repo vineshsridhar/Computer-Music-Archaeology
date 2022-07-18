@@ -1,0 +1,86 @@
+.TH CHMAP 1 "MIDI"
+.SH NAME
+chmap \- remap MIDI channel commands
+.SH SYNOPSIS
+.B chmap
+[newlist\fB=\fPoldlist] ... <file1 >file2
+.SH DESCRIPTION
+.I Chmap
+reads MIDI command streams
+and changes old channel numbers
+to new channel numbers.
+.PP
+In the synopsis, \fIoldlist\fP and \fIoldlist\fP represent lists
+of channel numbers where each channel number is
+specified by a decimal number in the range 1 to 16.
+Channel numbers may be concatenated with "\fB,\fP" and ranges
+may be represented by the first and last numbers separated by "\fB\-\fP".
+Thus, \fI11\-16\fP is equivalent to \fI11,12,13,14,15,16\fP,
+or to \fP11\-13,14\-16\fP.
+.PP
+If the number of channels in \fInewlist\fP and \fIoldlist\fP are the same,
+a one-to-one mapping will result.
+As the MIDI commands are read from the input and written on the output
+those commands that "belong" to an \fIoldlist\fP channel
+will be passed to the output after being remapped to the
+corresponding \fInewlist\fP channel.
+.PP
+If the \fIoldlist\fP contains more than one channel and the \fInewlist\fP
+contains only one, a many-to-one mapping will result.
+As the MIDI commands are read from the input and written on the output
+those commands that "belong" to an \fIoldlist\fP channel
+will be passed to the output after being remapped to the
+single channel specified in the \fInewlist\fP.
+.PP
+If the \fInewlist\fP contains more than one channel and the \fIoldlist\fP
+contains only one, a one-to-many mapping will result.
+As the MIDI commands are read from the input and written on the output
+those commands that "belong" to the channel mentioned in the \fIoldlist\fP
+will be output once for each channel specified in the \fInewlist\fP.
+.PP
+Multiple arguments are additive, see examples below.
+.PP
+If no channel mapping arguments are specified, \fIchmap\fP will print
+a count of MIDI messages by channel number and no MIDI output will be
+generated.
+.SH EXAMPLES
+.Cs
+chmap 15,16=1,2 <bach >rebach
+.Ce
+This will copy all MIDI commands from bach that refer to channels
+1 or 2, reassigning them to channels 15 and 16 respectively.
+All MIDI commands referring to other channels will not be copied.
+.Cs
+chmap 1=1,2,10\-12 <bach >rebach
+chmap 1=1 1=2 1=10\-12 <bach >rebach
+.Ce
+Both syntaxes will copy MIDI commands that refer to channel 1 unchanged,
+and will map commands for channels 2, 10, 11, and 12 to channel 1.
+.Cs
+chmap 2\-4=1 <bach >rebach
+.Ce
+This will map MIDI commands that refer to channel 1 to
+channel 2 \fIand\fP channel 3 \fIand\fP channel 4.
+This can be used to great advantage for ``fattening'' a piece.
+.Cs
+chmap 1,3=1 2,3=2 <bach >rebach
+.Ce
+This will copy MIDI commands that refer to channels 1 and 2
+straight through, making a copy of each in channel 3.
+.PP
+Note that status bytes and events pertaining to any channel number not
+mentioned in any \fIoldlist\fP will be discarded.
+.Cs
+chmap <bach
+20 events from chan 1
+2 events from chan 2
+221 events from chan 3
+221 events from chan 5
+84 events from chan 11
+83 events from chan 13
+.Ce
+.SH SEE ALSO
+kmap(1), mecho(1)
+\fIRoland MPU-401 Technical Reference Manual\fP.
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

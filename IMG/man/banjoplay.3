@@ -1,0 +1,171 @@
+.TH BANJOPLAY 3  MIDI
+.SH NAME
+banjoplay \- compose a banjo part to fit specified chords
+.SH SYNOPSES
+.Cs +0
+cc ... \-lmidi
+.sp
+banjotune(key, stones, chans)
+int	key;
+int	stones[12];
+int	chans[5];
+.sp
+banjoplay(start, stop, otones, ntones, vel, ofp)
+long	start;
+long	stop;
+int	otones[12];
+int	ntones[12];
+int	vel;
+FILE	*ofp;
+.Ce
+.SH DESCRIPTION
+These routines produce banjo improvizations to fit with a series of
+harmonic environments (sometimes called ``chords'').
+The generated melodies are constrained by guidelines designed to produce
+harmonious and fairly melodic sequences.  The strongest single set of
+constraints, however, are those that take into account the physical
+structure of the American five-string banjo and standard ``Scruggs style''
+playing patterns.  As a result, the melodies produced are uniquely
+banjo-like and are relatively easy to play on a banjo (by humans, that is).
+.PP
+\fIBanjotune()\fP initializes several global parameters:
+the way the strings are tuned, which notes are considered ``in the scale''
+(and therefore usable as passing tones)
+and which MIDI channels are to be used for the output.
+.IP key
+A number from 0 to 11 (C \= 0, C# \= 1, .\|.\|.\|, B \= 11)
+that selects the banjo tuning to be used.
+For the moment, all the keys are assumed to be major.
+For example, a \fBkey\fP value of 2 specifies A Major; the banjo will be
+tuned in the standard ``open G'' tuning with a capo on the second fret and
+the fifth string raised to A.
+Calling middle C ``C3'', the resulting tuning will be:
+E3 (first string), C#3, A2, E2 (fourth string), and A3 (fifth string).
+Tuning can be specified explicitly by setting the \fBTuning[]\fP global
+\fIafter\fP calling \fIbanjotune()\fP; see ``GLOBALS'' below.
+.IP stones
+An array of twelve booleans that are
+either zero or non-zero to indicate whether the corresponding pitch class
+(0 \= C, 1 \= C#, etc.) is ``in the scale''.  The most likely values for
+a piece in A Major would be: 0,1,1,0,1,0,1,0,1,1,0,1 (i.e. C#, D, E, F#, G#,
+A, and B are to be used).
+.IP chans
+The MIDI channel numbers are expressed as an array of integers in the range
+0 to 15.
+Note that most programs call this same range 1 to 16.
+The array should contain 5 channel numbers
+(they can all be the same or different).
+.PP
+\fIBanjoplay()\fP composes and writes out the music.
+It has arguments to specify the length of the section to be generated,
+the harmonic environment during and following the section, the loudness
+(really MIDI velocity), and the standard I/O file pointer to
+which the output should be directed.
+.IP start
+The time at which the output should begin, measured in MPU clocks
+(typically 120 MPU clocks per beat).  This is usually, but not necessarily,
+the \fBstop\fP argument from the previous call to \fIbanjoplay()\fP.
+.IP stop
+The time at which the output should end, again measured in MPU clocks.
+The last note generated will end on or before this time.
+.IP otones
+An array of twelve booleans (interpreted in the same way as the \fBstones\fP
+argument to \fIbanjotune()\fP) that define notes that fit in the current
+harmonic environment (i.e. notes that are ``in the chord'').
+If all twelve values are 0, a rest is assumed and \fIbanjoplay()\fP will
+generate something appropriate for a break in the accompaniment.
+This is commonly used at the beginning of a piece.
+.IP ntones
+An array of twelve booleans (interpreted in the same way as the \fBstones\fP
+argument) that define notes that fit in the next harmonic environment
+(i.e. notes that are ``in the next chord'').  These are often identical to
+those in \fBotones\fP.
+If \fBntones[0]\fP is negative the end of the piece is indicated;
+\fIbanjoplay()\fP will generate an ending.
+.IP vel
+The MIDI key velocity for the notes generated.  This usually translates
+to loudness on most synthesizers (although many also change things like
+the attack and overtone content so the effect is that of playing louder
+rather than just turning up the volume).
+.IP ofp
+The standard I/O file pointer to which output should be sent.
+This is most often ``stdout''.
+.SH GLOBALS
+Several important parameters are defined globally to allow programs using
+these routines to make adjustments.  All of them are defined as integers.
+.IP Mrhpat
+This is the number of right hand picking patterns that are defined.
+As of this moment, 10 patterns are defined:
+``forward roll'' T,I,M,T,I,M,T,M,
+``backward roll'' T,M,I,T,M,I,T,M,
+``backup roll'' T,I,M,T,M,I,T,M,
+``4-note roll'' T,I,M,T,T,I,M,T,
+``split roll'' T,I,M,T,M,T,M,I,
+``flat pick'' T,I,T,I,T,I,T,I,
+``foggymtn'' I,M,I,M,T,I,M,T,
+``double thumb'' T,I,T,M,T,I,T,M,
+``Hickman'' T,I,T,M,T,\-,T&M,\-,
+``bum-chang'' I,\-,T&M,\-,I,\-,T&M,\-,
+(If these names and patterns mean nothing to you, then you probably don't
+need to worry about this parameter.)
+This parameter is made global so programs can determine how many
+patterns exist (it should not be reset by user programs).
+.IP Nrhpat
+This is the number of right hand picking patterns from which \fIbanjoplay\fP
+is allowed to select.
+Setting \fBNrhpat\fP to 5 limits \fIbanjoplay()\fP to using the first five
+patterns.  The default value is 8.
+Note: \fBNrhpat\fP should never be greater than \fBMrhpat\fP.
+.IP Nrhptry
+\fIBanjoplay()\fP uses a pseudorandom number to choose several picking
+patterns to try for each sequence of music.  It then tries different
+combinations of left hand position and string choices for each of the
+right hand patterns.  From all the possibilities generated, it chooses
+the ``best'' one and uses that.  \fBNrhptry\fP determines how many
+right-hand picking patterns are tried each time.  The default value is 3.
+.IP Tuning
+The global variable \fBTuning[]\fP is an array of five integers indicating the
+MIDI key number (60 \(== middle C) for each string; \fBTuning[0]\fP is the
+key number for the first string.
+When \fIbanjotune()\fP is called it sets \fBTuning[]\fP appropriately for the
+specified \fBkey\fP; for instance, if \fBkey\fP is 7 the banjo is assumed to
+be in G Major, whose tuning is: 62, 59, 55, 50, 67.
+For a special tuning, \fBTuning[]\fP can be reset
+after the call to \fIbanjotune()\fP.
+If a piece will be in G minor it will be easier to make up a solo with the
+banjo tuned as: 62, 58, 55, 50, 67 (making the second string a Bb instead of
+a B).
+.SH EXAMPLE
+Here is an example of a program to play a short introduction,
+then a solo over the chords for the song
+``Dance All Night With A Bottle In My Hand'',
+and finally an ending; all in the key of G.
+.Cs
+#define	Q	120	/* duration of a quarter note in MPU clocks */
+int	Stones[]	= { 1,0,1,0,1,0,1,1,0,1,0,1, }
+int	Gchord[]	= { 0,0,1,0,0,0,0,1,0,0,0,1, }
+int	D7chord[]	= { 1,0,1,0,0,0,1,0,0,1,0,0, }
+int	Begin[]		= { 0,0,0,0,0,0,0,0,0,0,0,0, }
+int	End[]		= { \-1,0,0,0,0,0,0,0,0,0,0,0, }
+int	Chans[5]	= { 3, 3, 3, 3, 3, };
+
+main()
+{
+	banjotune(7, Stones, Chans);	/* key of G, all MIDI channel "4" */
+	banjoplay(0*Q, 2*Q, Begin, Gchord, 64, stdout);
+					/* 2 beat long beginning */
+	banjoplay(2*Q, 6*Q, Gchord, D7chord, 64, stdout);
+					/* 4 beats of G, medium velocity */
+	banjoplay(6*Q, 8*Q, D7chord, Gchord, 80, stdout);
+					/* 2 beats of D7, loud */
+	banjoplay(10*Q, 12*Q, Gchord, Gchord, 64, stdout);
+					/* 2 beats of G, medium velocity */
+	banjoplay(12*Q, 16*Q, Gchord, End, 80, stdout);
+					/* 4 beats of ending, loud */
+	exit(0);
+}
+.Ce
+.SH SEE ALSO
+sbsd(3)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

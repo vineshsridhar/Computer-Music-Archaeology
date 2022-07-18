@@ -1,0 +1,43 @@
+.TH MPU2SMF 1 "MIDI"
+.SH NAME
+mpu2smf - convert MPU format to Midi File Standard format
+.SH SYNOPSIS
+.B mpu2smf
+[\fB-v\fP [\fB-v\fP]] <mpu-file >smf-file
+.SH DESCRIPTION
+\fIMpu2smf\fP reads time-tagged MIDI data with imbedded MPU-401 codes
+and writes format 0 (single track) Midi File Standard (SMF) files.
+.PP
+The \fB\-v\fP option elicits diagnostic information about the conversion
+process.  Two of them elicits too much information.
+.PP
+The time division in the SMF header chunk is set to 96/quarter and
+a Tempo Meta-event for 100 beats/minute is inserted as the first event
+on the track.
+.PP
+The routines \fIputsmcmd()\fP and \fIchunkify()\fP are used to write the
+data; see getsmcmd(3).
+.SH EXAMPLE
+.Cs
+% da -T x.mpu
+ 0 ce 1b    ;      0      0 progc [ 15]=28  program
+   f8       ;    240      1 tcip            timing clock
+   f8       ;    480      2 tcip            timing clock
+   f8       ;    720      3 tcip            timing clock
+78 9e 34 47 ;    840      4 kon   [ 52]=71  E2 key on
+6c 9e 34  0 ;    948      5 koff  [ 52]=0   E2 key off
+ c f8       ;    960      6 no-op           mpu no-op
+% mpu2smf -v <x.mpu >x.smf
+Wrote 7-byte tempo meta-cmd
+Wrote 3-byte EOT meta-cmd with when=960
+Wrote 14 byte header chunk
+Wrote 31 bytes of data
+% bbtoax <x.smf
+4d 54 68 64 00 00 00 06 00 00 00 01 00 78 4d 54
+72 6b 00 00 00 17 00 ff 51 03 09 27 c0 00 ce 1b
+86 48 9e 34 47 6c 9e 34 00 0c ff 2f 00 
+.Ce
+.SH SEE ALSO
+bbtoax(1), getsmcmd(3), smfvar(3), smf2mpu(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

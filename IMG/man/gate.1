@@ -1,0 +1,31 @@
+.TH GATE 1 "October 20, 1989"
+.AT 3
+.SH NAME
+gate \- remove noise from \(*m-law audio data
+.SH SYNOPSIS
+.B gate
+[\fB\-s\fIsec\fR]
+[\fB\-t\fIdB\fR]
+.SH DESCRIPTION
+\fIGate\fP reads \(*m-law audio data from the standard input
+and writes a copy with passages that fall below a certain volume
+replaced with silence (muted).
+Two parameters control the gating action: a threshold and an attack/release
+time.
+The threshold is the level below which data is considered noise
+(lack of signal).
+The attack/release time is the duration over which no signal must be found
+in order to be selected for muting.
+When data is muted,
+a section of noise will be left before the muting (the attack) and 
+after the muting (the release).
+.IP \-s
+Set the attack/release time to \fIsec\fP seconds.
+The default is \fI\-s0.1\fP.
+.IP \-t
+Set the threshold to \fIdB\fP decibels.
+The default is \fI\-t18\fP (one eighth of the maximum volume).
+.SH SEE ALSO
+agc(1), squelch(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

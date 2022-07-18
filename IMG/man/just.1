@@ -1,0 +1,32 @@
+.TH JUST 1 "MIDI"
+.SH NAME
+just - justify (round off) MIDI note events
+.SH SYNOPSIS
+.B just
+[\fB-d\fP]
+[\fB-q\fP#]
+.SH DESCRIPTION
+.I Just
+copies its input MIDI data (stdin) to output,
+rounding off event timings to a multiple of the time quantum.
+.PP
+.SH Flags
+.IP "-d"
+make notes retain their original durations,
+i.e. each note-off will be displaced the same
+amount that the corresponding note-on was displaced.
+(This may be changed to become the default.)
+.IP "-q#"
+set the time quantum to #.
+The decimal integer \fI#\fP is the number of quanta per bar.
+Thus, \fI-q4\fP will cause key-on events to happen
+on quarter note "boundaries".
+Key-off events will also be justified to multiples of the quantum unless
+the \fB-d\fP option is specified.
+The default is \fI-q64\fP.
+.SH SEE ALSO
+adjust(1), stretch(1), tshift(1), unjust(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research
+(bellcore!psl)
+Based on a program by Gareth Loy & Michael Hawley.

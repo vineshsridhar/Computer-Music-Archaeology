@@ -1,0 +1,36 @@
+.TH MERGE 1 "MIDI"
+.SH NAME
+merge - merge several MIDI files into one
+.SH SYNOPSIS
+.B merge
+[\fB\-x\fP[#]]
+[\fBfiles\fP]
+.SH DESCRIPTION
+.I Merge
+merges its input \fIfiles\fP into a single time-ordered
+MIDI stream, and writes the result on the standard output.
+.PP
+The \fB\-x\fP option allows MIDI System Exclusive messages to be merged
+(they are normally ignored).  Such messages are limited to 1024 bytes.
+If longer System Exclusive messages must be merged, you can specify the
+necessary buffer size as a decimal number following \fB\-x\fP; for instance,
+\fB\-x4096\fP will allow System Exclusive messages up to 4096 bytes in length.
+.PP
+If a file name is specified as ``\fB\-\fP'' the standard input will be used.
+.SH EXAMPLE
+To combine several parallel tracks,
+say, \fIt1\fP, \fIt2\fP, \fIt3\fP
+into a single track called \fIt123\fP, you could use either of:
+.Cs
+merge t1 t2 t3 > t123
+cat t2 | merge t1 \- t3 > t123
+.Ce
+.SH FEATURES
+This version of \fImerge\fP replaces an earlier version that didn't understand
+pressure data or multiple channels.
+It's also more than ten times as fast as the earlier version.
+.SH SEE ALSO
+play(1), record(1), transpose(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research
+(bellcore!psl)

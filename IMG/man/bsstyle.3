@@ -1,0 +1,104 @@
+.TH BSSTYLE 3  MIDI
+.SH NAME
+bsstyle(), S[] \- style information for IMG
+.SH SYNOPSES
+.Cs +0
+cc ... \-lmidi
+.sp
+#define	BS	/* to include BS stuff from libamc.h */
+#include	<midi.h>
+.sp
+STYLE	S[]
+.sp
+STYLE	*
+bsstyle(name, styles, limit)
+char	*name;		/* short internal name */
+STYLE	styles[];	/* style repertoire */
+int	limit;		/* # of entries in styles[] or 0 */
+.Ce
+.SH DESCRIPTION
+The structure array \fIS\fP contains initialized data for a set of
+musical styles used by \fIIMG\fP(1).
+It also contains data for the Roland D110 synthesizer
+(the default in IMG).
+\fIS\fP has the following structure:
+.Cs
+typedef	struct	stylstr	{
+	char	name[6];	/* for programs */
+	int	barlen;		/* bar length (MPU clocks) */
+	int	units;		/* length quantum (MPU clocks) */
+	int	dpchn[4];	/* drum part source chans (1:16) */
+	char	desc[32];	/* description (for menu) */
+	char	lname[16];	/* for people (files & button labels)*/
+	int	key;		/* current key (0:11) */
+	int	cnti;		/* current count-in (0:2) */
+	char	leng[10];	/* current length */
+	int	tempo;		/* current tempo (20:240) */
+/* synth-specific */
+	int	linst[3];	/* lead instruments (1:128) */
+	int	lchan[3];	/* lead chans (1:16) */
+	int	lvolu[3];	/* lead chan volumes (1:127) */
+	int	lvelo[3];	/* lead velocities (1:127) */
+	int	ltrns[3];	/* lead transpositions (0:4) */
+	int	lener;		/* lead energy (0:100) */
+	int	lpred;		/* lead predictability */
+	int	lsfix;		/* lead seed fixed or random */
+	char	lseed[16];	/* lead seed */
+	int	binst;		/* bass inst (1:128) */
+	int	bchan;		/* bass chan (1:16) */
+	int	bvolu;		/* bass chan volume (1:127) */
+	int	bvelo;		/* bass velocity (1:127) */
+	int	btrns;		/* bass transposition (0:4) */
+	int	cinst;		/* chording inst (1:128) */
+	int	cchan;		/* chord chan (1:16) */
+	int	cvolu;		/* chord chan volume (1:127) */
+	int	cvelo;		/* chord velocity (1:127) */
+	int	ctrns;		/* chord transposition (0:4) */
+	int	dinst;		/* drum inst (1:128) */
+	int	dchan;		/* drum chan (1:16) */
+	int	dvolu;		/* drum chan volume (1:127) */
+	int	dvelo;		/* drum velocity (1:127) */
+	int	dpart;		/* drum part (0:3) */
+} STYLE;
+STYLE	S[NUMS];
+.Ce
+.PP
+.SH bsstyle(name, styles, limit)
+\fIBsstyle\fP looks up a style and
+returns a pointer to the appropriate STYLE entry.
+The arguments are:
+.IP name
+The name used is the short, five character internal name.
+.IP styles
+The style repertoire is a vector of STYLE structs terminated by
+an entry with name[0] set to NULL.
+.IP limit
+When using \fIbsstyle\fP to define new styles this should be set to the
+number of elements in styles[]; this assures that if no match is found
+and there is room, a pointer to the next empty STYLE struct will be
+returned.
+When using \fIbsstyle\fP just to find existing styles, limit should be
+set to 0 to insure that \fIbsstyle\fP will return (STYLE *) 0 if no match
+is found.
+.SH S[]
+As of the moment (2/11/90), the style repertoire in S[] is the following
+(both the internal 5-character ``name'' and the more readable ``desc''
+are given):
+.Cs
+bebop	Bebop Jazz
+grass	Bluegrass Banjo
+boogi	Boogie-Woogie
+class	Alberti Bass
+march	Strident March
+mozar	Mozart Waltz
+samba	Latin Samba
+seque	Pentatonic Wallpaper
+swing	Swing Combo Jazz
+toner	12-tone Sequences
+.Ce
+.SH FILES
+/u/psl/MIDI/BS/etc/*.setup	sample style/synth setup files
+.SH SEE ALSO
+bscomp(3), bssetup(3), IMG(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

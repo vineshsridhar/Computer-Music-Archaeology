@@ -1,0 +1,28 @@
+.TH INST 1 "MIDI"
+.SH NAME
+inst - generate MIDI commands to select instruments
+.SH SYNOPSIS
+.B inst
+[\fB-d\fP#] chan\fB=\fPinst ...
+.SH DESCRIPTION
+.I Inst
+generates "program change" commands to select instruments on one or
+many MIDI channels.
+\fIChan\fP is a decimal number from 1 to 16 and \fIinst\fP is a decimal
+number between 1 and 256 (inclusive).
+Example:
+.Cs
+play "|inst 1=9 16=8"
+.Ce
+If a Yamaha DX7 is assigned MIDI channel 1 and a Casio CZ-101 is assigned
+MIDI channel 16, this command will set the DX7 to internal voice 9
+(usually "PIANO  1") and the CZ-101 to preset voice 8 ("SYNTH.BASS").
+.PP
+By default, the program change code(s) will be followed by a pause
+(120 MIDI clocks) to let the instruments finish the change before
+any other data is sent.  The \fB-d\fP option sets the amount of delay;
+\fB-d0\fP or \fB-d\fP will suppress the delay altogether.
+.SH SEE ALSO
+chmap(1), chpress(1), cntl(1), pbend(1), sinst(1)
+.SH AUTHOR
+Peter Langston, Bell Communications Research (bellcore!psl)

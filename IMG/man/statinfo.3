@@ -1,0 +1,87 @@
+.TH STATINFO 3  MIDI
+.SH NAME
+statinfo, cmdlen, statproc \- process MIDI (& mpu) status/command bytes
+.SH SYNOPSIS
+.Cs +0
+cc ... \-lmidi
+#include <midi.h>
+.sp
+struct statstr *statinfo(status)
+int status;
+.sp
+int cmdlen(status)
+int status;
+.sp
+int statproc(statp, newbyte)
+int *statp, newbyte;
+.Ce
+.SH DESCRIPTION
+libmidi.h contains the following definitions:
+.Cs
+/* struct for status/command byte information in statinfo.c */
+struct	statstr	{
+	signed char	clen;	/* number of command bytes */
+	unsigned char	flgs;	/* misc. info, see below */
+};
+#d RSSET	1		/* Running Status SET by this command */
+#d RSCLR	2		/* Running Status CLeaRed by this command */
+#d RSNOP	4		/* Running Status unaffected by this command */
+#d UNDF		8		/* Not defined in the spec */
+.Ce
+\fIStatinfo(status)\fP
+returns a pointer to a statstr entry
+describing the length of commands started with ``status'' and other
+miscellaneous info such as their effect on ``running status''.
+It does not handle running status itself, i.e. it knows no history
+(and not much latin).
+.PP
+\fICmdlen(status)\fP
+returns the length of a MIDI command.
+-1 is returned for system exclusive commands
+(commands terminated by SX_EOB, 0xFF).
+0 is returned for illegal ``status''
+(value of \fIstatus\fP is outside the 0x80 to 0xFF range).
+Otherwise the length of the actual command is returned,
+(1 \- 3).  The length includes the status byte.
+.PP
+\fIStatproc(oldstatp, newbyte)\fP
+processes the first byte of a MIDI command,
+keeping track of running status, and returns:
+.ta 0.5i 1i
+.br
+	-1	system exclusive (commands terminated by SX_EOB, 0xFF)
+.br
+	0	illegal ``status'' (outside 0x80 to 0xFF range).
+.br
+	1-3	actual length (including status byte, \fIif present\fP)
+.PP
+For example:
+.Cs
+for (oldstat = 0; read(ifd, buf, 1) == 1; ) {
+	n = statproc(&oldstat, buf[0]) \- 1;
+	if (read(ifd, buf + 1, n) == n)
+		write(ofd, buf, n + 1);
+}
+.Ce
+In this loop each MIDI command
+(except system exclusive, which is not handled)
+will be written with a single write,
+and the status of the current command will be: ((*buf & M_CMD)? *buf : oldstat).
+Note that, for MPU data, the routine would have to also pass along timing
+bytes, perhaps in this fashion:
+.Cs
+for (oldstat = 0; read(ifd, buf, 1) == 1; ) {
+	write(ofd, buf, 1);
+	if (*buf != RT_TCIP && read(ifd, buf, 1) == 1) {
+		n = statproc(&oldstat, buf[0]) \- 1;
+		if (read(ifd, buf + 1, n) == n)
+			write(ofd, buf, n + 1);
+	}
+}
+.Ce
+Neither of these examples deals with System Exclusive (return value -1)
+in which the command runs until the next SX_EOB (or other status byte).
+Nor do they deal with errors (return value 0) from bad data.
+.SH AUTHOR
+Peter Langston, Bell Communications Research
+(bellcore!psl)
