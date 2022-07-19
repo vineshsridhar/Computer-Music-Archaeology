@@ -26,7 +26,6 @@
 #include	<stdio.h>
 #include	<midi.h>
 
-
 u_char	Rt_tcwmebuf[1] = {		/* MPU_TCWME command buffer */
 	MPU_TCWME,
 };
@@ -78,17 +77,18 @@ FILE	*ofp;
 MCMD	*mp;
 {
 	static int flush=2;		/* sau */
-
+	
 	if (flush==2)
 		flush = (getenv("FLUSH") != 0);
 
 	if (ofp == (FILE *) 0)
 	    return(Onow = (mp == (MCMD *) 0)? 0L : mp->when);
+
 	if (noteon == 1) /* Assume when in milliseconds. */
 		// Key, Channel, Dynamics, and start time.
-		fprintf(stdout, "K%d V%d L%d T%ld\n", mp->cmd[1], mp->cmd[0], mp->cmd[2], mp->when);
+		fprintf(stdout, "P%d K%d V%d L%d T%ld\n", mp->cmd[1], mp->cmd[1], mp->cmd[0] - 0x90, mp->cmd[2], mp->when);
 	else /* Turn off existing note */
-		fprintf(stdout, "K%d V%d L0 T%ld\n", mp->cmd[1], mp->cmd[0], mp->when);
+		fprintf(stdout, "K%d V%d L0 T%ld\n", mp->cmd[1], mp->cmd[0] - 0x90, mp->when);
 	if (flush)
 		 fflush(ofp);
 	return(Onow = mp->when);

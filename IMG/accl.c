@@ -325,7 +325,6 @@ long	now;
 
 	if (wrdcmp(cp, "#CHORD") == 0) {
 	    cp = speel(&bp, 0);
-	    printf("found at %d\n", find(cp));
 	    if ((cn = find(cp)) == -1 && (cn = Numchords++) >= MAXCH)
 		syntax("Too many chords defined");
 	    printf("cn: %d\n", cn);
