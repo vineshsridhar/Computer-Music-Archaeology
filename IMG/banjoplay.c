@@ -41,7 +41,7 @@ void pickfret(int lhloc, STEP *cstep, int tones[12], int beatval);
 int eval(PSEQ *ctp, PSEQ *ptp, int tones[][12]);
 void output(int t0, PSEQ *tp, int vel, FILE *ofp);
 
-
+// Right hand fingers
 struct	banfstr	Fi[DIGITS] = {	/* finger info */
 /*	code	lowest	highest	favorite	*/
 	{ T,	THIRD,	FIFTH,	FIFTH, },	/* thumb (numbers are -1) */
@@ -49,6 +49,7 @@ struct	banfstr	Fi[DIGITS] = {	/* finger info */
 	{ M,	FIRST,	THIRD,	FIRST, },	/* middle */
 };
 
+// Right hand patterns.
 int	Rhpat[][PATLEN] = {
 	T,   I,   M,   T,   I,   M,   T,   M,		/* forward */
 	T,   M,   I,   T,   M,   I,   T,   I,		/* backward */
@@ -63,6 +64,10 @@ int	Rhpat[][PATLEN] = {
 	I,   0,   T|M, 0,   I,   0,   T|M, 0,		/* bum-chang */
 };
 
+// BSEQ = "Banjo Sequence"
+// Each struct stores MPU start time
+// and a list of notes to play (relative to lowest root of key)
+// there are 5 indices, representing the five strings. Some sequences have multiple notes that play at the same time.
 static	BSEQ	Beg0[]	= {
 	{ 60,	-1,-1,-1, 7,-1, },
 	{ 120,	-1,-1,-1, 7,-1, },
@@ -115,6 +120,13 @@ static	BSEQ	Beg6[]	= {
 	{ 180,	-1,-1,12,-1,-1, },
 	{ 240,	-1,-1,-1,-1,-1, },
 };
+
+// Beginning riffs
+// RIFF structs store
+// - length of riff
+// - range of key values
+// - key to use for distance calc (in BSEQ)
+// - BSEQ string with notes
 static	RIFF	Bbegs[]	= {
 	{ 240,    7, 12,  7, Beg0, },
 	{ 240,    7, 19, 12, Beg1, },
@@ -127,6 +139,7 @@ static	RIFF	Bbegs[]	= {
 };
 int	Nbegs	= 7;
 
+// Ending sequences/riffs
 static	BSEQ	End0[]	= {
 	{ 0,	-1,-1,-1, 0,-1, },
 	{ 120,	-1,-1, 4,-1,-1, },
@@ -210,6 +223,8 @@ static	RIFF	Bends[]	= {
 };
 #define	NRHPAT	(sizeof Rhpat / sizeof Rhpat[0])
 
+// "pattern structure"
+// Placeholder to store previously used pattern
 PSEQ	Last	= {			/* can be preset (global) */
 	1,				/* initial left hand location */
 	0,				/* previous pattern */
@@ -244,6 +259,11 @@ static	int	Stones[12];
 /* this should really be an extern, but the loader gets confused */
 int	Debug;		/* debugging output (from main()) */
 
+/* Input is the key of the song, scale of the piece (boolean array), and the number of channels for each of the 5 strings. 
+ * Set scale and channel global arrays.
+ * Initialize the step info for each finger in the Last PSEQ struct.
+ * Tune the banjo to the appropriate key using the Tunes array.
+ */
 void
 banjotune(key, stones, chans)
 int	stones[12], chans[STRINGS];
@@ -252,7 +272,7 @@ int	stones[12], chans[STRINGS];
 
 	Key = key;
 	for (i = STRINGS; --i >= 0; Chan[i] = chans[i]);
-	for (i = 12; --i >= 0; Stones[i] = (stones[i]? 1 : 0));
+	for (i = 12; --i >= 0; Stones[i] = (stones[i]? 1 : 0)); // Stones is a boolean array that denotes scale pitches.
 	for (pt = PATLEN; --pt >= 0; ) {
 	    for (i = DIGITS; --i >= THUMB; ) {
 		Last.step[pt].key[i] = 0;
@@ -262,6 +282,13 @@ int	stones[12], chans[STRINGS];
 	for (i = STRINGS; --i >= 0; Tuning[i] = Tunes[Key % 12][i]);
 }
 
+/* start: start time of the music in MPU clocks
+ * stop: stop time of the music in MPU clocks
+ * otones: chord tones for current chord
+ * ntones: chord tones for next chord
+ * vel: midi key velocity for notes
+ * ofp: pointer to output file
+ */
 void
 banjoplay(start, stop, otones, ntones, vel, ofp)
 long	start, stop;
@@ -275,7 +302,7 @@ FILE	*ofp;
 	PSEQ try, btry;
 	static int tones[PATLEN][12];
 
-	tstart = start / SIXTEENTH;
+	tstart = start / SIXTEENTH; // Convert the number of MPU clocks to the number of sixteenth notes.
 	tstop = stop / SIXTEENTH;
 DBG(stderr, "banjoplay(%ld, %ld, otones, ntones, %d, ofp) tstart,tstop = %d,%d\n", start, stop, vel, tstart, tstop);
 	if (!otones[0] && !otones[1] && !otones[2] && !otones[3]
@@ -291,7 +318,7 @@ DBG(stderr, "banjoplay(%ld, %ld, otones, ntones, %d, ofp) tstart,tstop = %d,%d\n
 DBG(stderr, " used beg=%d\n", i);
 	    return;
 	}
-	if (ntones[0] < 0) {			/* end of piece */
+	if (ntones[0] < 0) {			/* end of piece. Current chord is last chord */
 	    for (pt = PATLEN; --pt >= 0; ) {
 		for (i = DIGITS; --i >= THUMB; )
 		    if (v = Last.step[pt].key[i])
@@ -549,16 +576,17 @@ DBG(stderr, "ending(start=%ld, stop=%ld, vel=%d, lastkey=%d, ofp)\n",
 	while (stop - start > 0) {
 	    bdist = 999;		/* choose an ending riff */
 	    blen = 0;
-	    for (seq = 0; Bends[seq].len; seq++) {
+	    for (seq = 0; Bends[seq].len; seq++) { // iterate through all ending sequences.
 		len = Bends[seq].len;
 		if (len > stop - start || len < blen)
 		    continue;
-		n = LOWPOS(Bends[seq].lo, Key); /* lowest position on banjo */
-		dist = lastkey - (n + Bends[seq].first);
+		n = LOWPOS(Bends[seq].lo, Key); /* Transpose sequence lowest pos'n to Key */
+		dist = lastkey - (n + Bends[seq].first); // Calculate distance between last note of prev sequence and first note of chosen Bend seq.
 		dist = dist < 0? -dist : dist;
-		if (len > blen
-		 || dist < bdist
-		 || (dist == bdist && PR50)) {
+		// Choose new best ending sequence.
+		if (len > blen // longer sequences are better
+		 || dist < bdist // sequences with better voiceleading from prev sequence better
+		 || (dist == bdist && PR50)) { // if all the same, then flip a 50-50 coin (PR50)
 		    bseq = seq;
 		    bdist = dist;
 		    blen = len;
@@ -571,6 +599,12 @@ DBG(stderr, " used end=%d, lastkey=%d, now start=%ld\n", bseq, lastkey, start);
 	return;
 }
 
+/* Output the sequence.
+ * rp: Pointer to the riff in the Bends RIFF array
+ * start: start time in MPU clocks
+ * vel: key velocity for notes
+ * ofp: output file pointer
+ */
 int seqout(rp, start, vel, ofp)
 RIFF	*rp;
 long	start;
@@ -581,7 +615,7 @@ FILE	*ofp;
 	BSEQ *sp;
 	MCMD m;
 
-	slen = rp->len;
+	slen = rp->len; //sequence length
 	tran = LOWPOS(rp->lo, Key); /* lowest position on banjo */
 	m.len = 3;
 	m.cmd = mbuf;
