@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Sridhar"
+  given-names: "Vinesh"
+- family-names: "Dannenberg"
+  given-names: "Roger"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+title: "Computer-Music-Archaeology"
+version:
+doi: 10.5281/zenodo.1234
+date-released:
+url: "https://github.com/vineshsridhar/Computer-Music-Archaeology"
